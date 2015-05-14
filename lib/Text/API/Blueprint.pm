@@ -58,8 +58,13 @@ no namespace::clean;
 sub _autoprint {
     my ($wantarray, $str) = @_;
     if ($Autoprint and not defined $wantarray) {
-        my $H = (ref($Autoprint) eq 'GLOB') ? $Autoprint : \*STDOUT;
-        print $H $str;
+        if (ref $Autoprint eq 'SCALAR') {
+            $$Autoprint .= $str;
+        } elsif (ref $Autoprint eq 'GLOB') {
+            print *$Autoprint $str;
+        } else {
+            print $str;
+        }
     } else {
         return $str;
     }
@@ -136,9 +141,14 @@ sub Section {
     my ($coderef, $offset) = @_;
     $offset //= 1;
     $Offset += $offset;
-    my $X = Exception::Delayed->wantany(wantarray, $coderef);
+    my $autoprint = $Autoprint;
+    $Autoprint = \"";
+    my $X = Exception::Delayed->wantany(undef, $coderef);
+    my $str = $$Autoprint;
+    $Autoprint = $autoprint;
     $Offset -= $offset;
-    return _autoprint(wantarray, $X->result);
+    $X->result;
+    return _autoprint(wantarray, $str);
 }
 
 =func Meta
