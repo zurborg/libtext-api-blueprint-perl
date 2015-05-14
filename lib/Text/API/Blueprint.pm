@@ -202,20 +202,6 @@ sub Code {
     return _autoprint(wantarray, "$delimiter$lang\n$code\n$delimiter\n\n");
 }
 
-=func Definition
-
-B<Invkokation>: Definition( Str C<$keyword>, [ Str C<$identifier> ], [ Str C<$media_type> ], [ Str <$body> ], [ Int <$indent> ] )
-
-=cut
-
-sub Definition {
-    my ($keyword, $identifier, $media_type, $body, $indent) = @_;
-    my $str = "$keyword";
-    $str .= " $identifier" if $identifier;
-    $str .= " ($media_type)" if $media_type;
-    return _autoprint(wantarray, _listitem($str, $body, $indent));
-}
-
 =func Group
 
 B<Invokation>: Group(
