@@ -144,6 +144,24 @@ See ["Payload"](#payload) if `$payload` is a HashRef.
     ArrayRef `:$responses`
 )
 
+- See ["Section"](#section) if `$body` is a CodeRef
+- See ["Parameters"](#parameters) for `$parameters`
+- See ["Asset"](#asset) for `$assets`
+- See ["Request"](#request) for `$request` and `$requests`
+- See ["Response"](#response) for `$response` and `$responses`
+
+    ### $identifier [$method $uri]
+    
+    $body
+
+    ### $identifier [$method]
+    
+    $body
+
+    ### $method
+    
+    $body
+
 ## Payload
 
 **Invokation**: PayLoad(
@@ -156,6 +174,50 @@ See ["Payload"](#payload) if `$payload` is a HashRef.
     AnyRef `:$json`,
     Str `:$schema`
 )
+
+- See ["Body"](#body) for `$body`
+- See ["Body\_CODE"](#body_code) for `$code` and `$lang`
+- See ["Body\_YAML"](#body_yaml) for `$yaml`
+- See ["Body\_JSON"](#body_json) for `$json`
+
+Complete output:
+
+    $description
+    
+    + Headers
+            $key: $value
+    
+    + Body
+    
+    $body
+    
+    + Schema
+    
+    $schema
+
+With `$code` and `$lang`:
+
+    + Body
+    
+        ```$lang
+        $code
+        ```
+
+With `$yaml`:
+
+    + Body
+    
+        ```yaml
+        $yaml
+        ```
+
+With `$json`:
+
+    + Body
+
+        ```json
+        $json
+        ```
 
 ## Asset
 
@@ -333,57 +395,6 @@ For every keypair, ["Parameter"](#parameter)(`$name`, `%$options`) will be calle
     ## $uri
     
     $body
-
-    ### $identifier [$method $uri]
-    
-    $body
-
-    ### $identifier [$method]
-    
-    $body
-
-    ### $method
-    
-    $body
-
-Complete output:
-
-    $description
-    
-    + Headers
-            $key: $value
-    
-    + Body
-    
-    $body
-    
-    + Schema
-    
-    $schema
-
-With `$code` and `$lang`:
-
-    + Body
-    
-        ```$lang
-        $code
-        ```
-
-With `$yaml`:
-
-    + Body
-    
-        ```yaml
-        $yaml
-        ```
-
-With `$json`:
-
-    + Body
-
-        ```json
-        $json
-        ```
 
 # BUGS
 

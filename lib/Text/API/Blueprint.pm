@@ -347,12 +347,19 @@ B<Invokation>: Action(
     ArrayRef C<:$responses>
 )
 
-=for :list
-See L</Section> if C<$body> is a CodeRef
-See L</Parameters> for C<$parameters>
-See L</Asset> for C<$assets>
-See L</Request> for C<$request> and C<$requests>
-See L</Response> for C<$response> and C<$responses>
+=over 4
+
+=item * See L</Section> if C<$body> is a CodeRef
+
+=item * See L</Parameters> for C<$parameters>
+
+=item * See L</Asset> for C<$assets>
+
+=item * See L</Request> for C<$request> and C<$requests>
+
+=item * See L</Response> for C<$response> and C<$responses>
+
+=back
 
     ### $identifier [$method $uri]
     
@@ -430,11 +437,17 @@ B<Invokation>: PayLoad(
     Str C<:$schema>
 )
 
-=for :list
-* See L</Body> for C<$body>
-* See L</Body_CODE> for C<$code> and C<$lang>
-* See L</Body_YAML> for C<$yaml>
-* See L</Body_JSON> for C<$json>
+=over 4
+
+=item * See L</Body> for C<$body>
+
+=item * See L</Body_CODE> for C<$code> and C<$lang>
+
+=item * See L</Body_YAML> for C<$yaml>
+
+=item * See L</Body_JSON> for C<$json>
+
+=back
 
 Complete output:
 
