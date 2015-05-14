@@ -13,8 +13,42 @@ use Exporter qw(import);
 
 # VERSION
 
-our @EXPORT_OK = qw(Action Body Code Definition Group Headers Intro Meta Model Parameters Relation Resource Request Response Schema Text);
-our %EXPORT_TAGS = (all => [@EXPORT_OK]);
+our @EXPORT_OK = qw/
+    Action
+    Asset
+    Body
+    Body_CODE
+    Body_JSON
+    Body_YAML
+    Code
+    Concat
+    Group
+    Headers
+    Intro
+    Meta
+    Model
+    Parameter
+    Parameters
+    Payload
+    Reference
+    Relation
+    Request
+    Request_Ref
+    Resource
+    Response
+    Response_Ref
+    Schema
+    Section
+    Text
+/;
+our %EXPORT_TAGS = (
+    all => [ @EXPORT_OK ],
+    minimal => [qw[ Meta Intro Resource Group ]],
+    resource => [qw[ Resource Parameters Model Action ]],
+    model => [qw[ Model Headers Body Schema ]],
+    action => [qw[ Action Relation Parameters Asset Reference Request Response ]],
+    helpers => [qw[ Code Concat Section Text ]],
+);
 
 our $Autoprint = 0;
 our $Offset = 0;
