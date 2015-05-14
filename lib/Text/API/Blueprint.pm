@@ -284,18 +284,29 @@ B<Invokation>: Resource(
     ArrayRef C<:$actions>
 )
 
-=for :list
-* See L</Parameters> for C<$parameters>
-* See L</Model> for C<$model>
-* See L</Action> for C<$actions>
+=over 4
+
+=item * See L</Parameters> for C<$parameters>
+
+=item * See L</Model> for C<$model>
+
+=item * See L</Action> for C<$actions>
+
+=back
+
+With C<$method> and C<$uri>
 
     ## $method $uri
     
     $body
 
+With C<$identifier> and C<$uri>
+
     ## $identifier [$uri]
     
     $body
+
+With C<$uri>
 
     ## $uri
     
@@ -405,7 +416,7 @@ B<Invokation>: Action(
 
 =back
 
-With C<$method> and C<$uri>:
+With C<$identifier> C<$method> and C<$uri>:
 
     ### $identifier [$method $uri]
     
