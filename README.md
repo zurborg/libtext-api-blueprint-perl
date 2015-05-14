@@ -10,37 +10,82 @@ version 0.001
 
 ## Section
 
-**Invokation**: Section( CodeRef `$coderef` , \[ Int `$offset` \] )
+**Invokation**: Section(
+    CodeRef `$coderef`,
+    \[ Int `$offset` = `1` \]
+)
+
+Increments header offset by `$offset` for everything executed in `$coderef`.
 
 ## Meta
 
-**Invokation**: Meta( \[ Str `$host` \] )
+**Invokation**: Meta(
+    \[ Str `$host` \]
+)
+
+    FORMAT: 1A8
+    HOST: $host
 
 ## Intro
 
-**Invokation**: Intro( Str `$name`, Str `$description` )
+**Invokation**: Intro(
+    Str `$name`,
+    Str `$description`
+)
+
+    # $name
+    $description
 
 ## Concat
 
-**Invokation**: Concat( Str `@blocks` )
+**Invokation**: Concat(
+    Str `@blocks`
+)
+
+    $block[0]
+    
+    $block[1]
+    
+    $block[2]
+    
+    ...
 
 ## Text
 
-**Invkokation**: Text( Str `@strings` )
+**Invokation**: Text(
+    Str `@strings`
+)
+
+    $string[0]
+    $string[1]
+    $string[2]
+    ...
 
 ## Code
 
-**Invkokation**: Code( Str `$code`, \[ Str `$lang` = `''` \], \[ Int `$delimiters` = `3` \] )
+**Invokation**: Code(
+    Str `$code`,
+    \[ Str `$lang` = `''` \],
+    \[ Int `$delimiters` = `3` \]
+)
 
-## Definition
-
-**Invkokation**: Definition( Str `$keyword`, \[ Str `$identifier` \], \[ Str `$media_type` \], \[ Str <$body> \], \[ Int <$indent> \] )
+    ```$lang
+    $code
+    ```
 
 ## Group
 
-**Invokation**: Group( Str `$identifier`, Str | ArrayRef\[ HashRef | Str \] `$body`, \[ Int `$indent` \] )
+**Invokation**: Group(
+    Str `$identifier`,
+    Str|ArrayRef\[HashRef|Str\] `$body`,
+    \[ Int `$indent` \]
+)
 
-If `$body` is an ArrayRef, every item which is a HashRef will be passed to ["Resource"](#resource). 
+If `$body` is an ArrayRef, every item which is a HashRef will be passed to ["Resource"](#resource).
+
+    # Group $identifier
+    
+    $body
 
 ## Resource
 
@@ -58,13 +103,28 @@ If `$body` is an ArrayRef, every item which is a HashRef will be passed to ["Res
 
 ## Model
 
-**Invokation**: Model( Str `$media_type`, Str | HashRef `$payload`, \[ Int `$indent` \] )
+**Invokation**: Model(
+    Str `$media_type`,
+    Str|HashRef `$payload`,
+    \[ Int `$indent` \]
+)
 
 See ["Payload"](#payload) if `$payload` is a HashRef.
 
+    + Model ($media_type)
+    
+    $payload
+
 ## Schema
 
-**Invokation**: Schema( Str `$body`, \[ Int `$indent` \] )
+**Invokation**: Schema(
+    Str `$body`,
+    \[ Int `$indent` \]
+)
+
+    + Schema
+    
+    $body
 
 ## Action
 
@@ -72,7 +132,7 @@ See ["Payload"](#payload) if `$payload` is a HashRef.
     Str `:$method`,
     Str `:$uri`,
     Str `:$identifier`,
-    Str | CodeRef `:$body`,
+    Str|CodeRef `:$body`,
     Int `:$indent`,
     Int `:$level`,
     Str `:$relation`,
@@ -81,7 +141,7 @@ See ["Payload"](#payload) if `$payload` is a HashRef.
     ArrayRef `:$request`,
     ArrayRef `:$requests`,
     ArrayRef `:$response`,
-    ArrayRef `:$responses`,
+    ArrayRef `:$responses`
 )
 
 ## Payload
@@ -94,46 +154,77 @@ See ["Payload"](#payload) if `$payload` is a HashRef.
     Str `:$lang`,
     AnyRef `:$yaml`,
     AnyRef `:$json`,
-    Str `:$schema`,
+    Str `:$schema`
 )
 
 ## Asset
 
-**Invokation**: Asset( Str `$keyword`, Str `$identifier`, Str <:$type>, %payload )
+**Invokation**: Asset(
+    Str `$keyword`,
+    Str `$identifier`,
+    Str `:$type`,
+    `%payload`
+)
 
 See ["Payload"](#payload) for `%payload`
 
+    # $keyword $identifier ($type)
+    
+    $payload
+
 ## Reference
 
-**Invokation**: Reference( Str `$keyword`, Str `$identifier`, Str `$reference` )
+**Invokation**: Reference(
+    Str `$keyword`,
+    Str `$identifier`,
+    Str `$reference`
+)
+
+    # $keyword $identifier
+    
+        [$reference][]
 
 ## Request
 
-**Invokation**: Request( `@args` )
+**Invokation**: Request(
+    `@args`
+)
 
 Calls ["Asset"](#asset)( `'Request'`, `@args` )
 
 ## Request\_Ref
 
-**Invokation**: Request\_Ref( `@args` )
+**Invokation**: Request\_Ref(
+    `@args`
+)
 
 Calls ["Reference"](#reference)( `'Request'`, `@args` )
 
 ## Response
 
-**Invokation**: Response( `@args` )
+**Invokation**: Response(
+    `@args`
+)
 
 Calls ["Asset"](#asset)( `'Response'`, `@args` )
 
 ## Response\_Ref
 
-**Invokation**: Response\_Ref( `@args` )
+**Invokation**: Response\_Ref(
+    `@args`
+)
 
 Calls ["Reference"](#reference)( `'Response'`, `@args` )
 
 ## Parameters
 
-**Invokation**: Parameters( \[ Str `$name` => HashRef `$options` \]\* )
+**Invokation**: Parameters(
+    \[
+        Str `$name`
+        =>
+        HashRef `$options`
+    \]\*
+)
 
 For every keypair, ["Parameter"](#parameter)(`$name`, `%$options`) will be called
 
@@ -147,34 +238,152 @@ For every keypair, ["Parameter"](#parameter)(`$name`, `%$options`) will be calle
     Str `:$type`,
     Str `:$enum`,
     Str `:$shortdesc`,
-    Str | ArrayRef\[ Str \] `:$longdesc`,
+    Str|ArrayRef\[Str\] `:$longdesc`,
     Str `:$default`,
-    HashRef `:$members`,
+    HashRef `:$members`
 )
+
+    + $name: `$example` ($type, $required_or_optional) - $shortdesc
+    
+        $longdesc
+        
+        + Default: `$default`
+        
+        + Members
+            + `$key` - $value
+            + ...
 
 ## Headers
 
-**Invokation**: Headers( \[ Str `$key` => Str `$value` \]\* )
+**Invokation**: Headers(
+    \[
+        Str `$key`
+        =>
+        Str `$value`
+    \]\*
+)
+
+    + Headers
+        $key: $value
+        ...
 
 ## Body
 
-**Invokation**: Body( Str `$body` )
+**Invokation**: Body(
+    Str `$body`
+)
+
+    + Body
+    
+            $body
 
 ## Body\_CODE
 
-**Invokation**: Body\_CODE( Str `$code`, Str `$lang` )
+**Invokation**: Body\_CODE(
+    Str `$code`,
+    Str `$lang`
+)
+
+    + Body
+    
+        ```$lang
+        $code
+        ```
 
 ## Body\_YAML
 
-**Invokation**: Body\_YAML( AnyRef `$struct` )
+**Invokation**: Body\_YAML(
+    AnyRef `$struct`
+)
+
+    + Body
+    
+        ```yaml
+        $struct
+        ```
 
 ## Body\_JSON
 
-**Invokation**: Body\_JSON( AnyRef `$struct` )
+**Invokation**: Body\_JSON(
+    AnyRef `$struct`
+)
+
+    + Body
+    
+        ```json
+        $struct
+        ```
 
 ## Relation
 
-**Invokation**: Relation( Str `$link` )
+**Invokation**: Relation(
+    Str `$link`
+)
+
+    + Relation: $link
+
+    ## $method $uri
+    
+    $body
+
+    ## $identifier [$uri]
+    
+    $body
+
+    ## $uri
+    
+    $body
+
+    ### $identifier [$method $uri]
+    
+    $body
+
+    ### $identifier [$method]
+    
+    $body
+
+    ### $method
+    
+    $body
+
+Complete output:
+
+    $description
+    
+    + Headers
+            $key: $value
+    
+    + Body
+    
+    $body
+    
+    + Schema
+    
+    $schema
+
+With `$code` and `$lang`:
+
+    + Body
+    
+        ```$lang
+        $code
+        ```
+
+With `$yaml`:
+
+    + Body
+    
+        ```yaml
+        $yaml
+        ```
+
+With `$json`:
+
+    + Body
+
+        ```json
+        $json
+        ```
 
 # BUGS
 
