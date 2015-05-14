@@ -150,13 +150,19 @@ See ["Payload"](#payload) if `$payload` is a HashRef.
 - See ["Request"](#request) for `$request` and `$requests`
 - See ["Response"](#response) for `$response` and `$responses`
 
+With `$method` and `$uri`:
+
     ### $identifier [$method $uri]
     
     $body
 
+With `$identifier` and `$method`:
+
     ### $identifier [$method]
     
     $body
+
+With `$method`:
 
     ### $method
     
@@ -164,7 +170,7 @@ See ["Payload"](#payload) if `$payload` is a HashRef.
 
 ## Payload
 
-**Invokation**: PayLoad(
+**Invokation**: Payload(
     Str `:$description`,
     HashRef `:$headers`,
     Str `:$body`,

@@ -361,13 +361,19 @@ B<Invokation>: Action(
 
 =back
 
+With C<$method> and C<$uri>:
+
     ### $identifier [$method $uri]
     
     $body
 
+With C<$identifier> and C<$method>:
+
     ### $identifier [$method]
     
     $body
+
+With C<$method>:
 
     ### $method
     
@@ -426,7 +432,7 @@ sub Action {
 
 =func Payload
 
-B<Invokation>: PayLoad(
+B<Invokation>: Payload(
     Str C<:$description>,
     HashRef C<:$headers>,
     Str C<:$body>,
