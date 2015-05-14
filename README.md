@@ -101,6 +101,28 @@ If `$body` is an ArrayRef, every item which is a HashRef will be passed to ["Res
     ArrayRef `:$actions`
 )
 
+- See ["Parameters"](#parameters) for `$parameters`
+- See ["Model"](#model) for `$model`
+- See ["Action"](#action) for `$actions`
+
+With `$method` and `$uri`
+
+    ## $method $uri
+    
+    $body
+
+With `$identifier` and `$uri`
+
+    ## $identifier [$uri]
+    
+    $body
+
+With `$uri`
+
+    ## $uri
+    
+    $body
+
 ## Model
 
 **Invokation**: Model(
@@ -150,7 +172,7 @@ See ["Payload"](#payload) if `$payload` is a HashRef.
 - See ["Request"](#request) for `$request` and `$requests`
 - See ["Response"](#response) for `$response` and `$responses`
 
-With `$method` and `$uri`:
+With `$identifier` `$method` and `$uri`:
 
     ### $identifier [$method $uri]
     
@@ -389,18 +411,6 @@ For every keypair, ["Parameter"](#parameter)(`$name`, `%$options`) will be calle
 )
 
     + Relation: $link
-
-    ## $method $uri
-    
-    $body
-
-    ## $identifier [$uri]
-    
-    $body
-
-    ## $uri
-    
-    $body
 
 # BUGS
 
