@@ -89,7 +89,12 @@ use namespace::clean;
 
 =func Section
 
-B<Invokation>: Section( CodeRef C<$coderef> , [ Int C<$offset> ] )
+B<Invokation>: Section(
+    CodeRef C<$coderef>,
+    [ Int C<$offset> = C<1> ]
+)
+
+Increments header offset by C<$offset> for everything executed in C<$coderef>.
 
 =cut
 
@@ -104,7 +109,12 @@ sub Section {
 
 =func Meta
 
-B<Invokation>: Meta( [ Str C<$host> ] )
+B<Invokation>: Meta(
+    [ Str C<$host> ]
+)
+
+    FORMAT: 1A8
+    HOST: $host
 
 =cut
 
@@ -117,7 +127,13 @@ sub Meta {
 
 =func Intro
 
-B<Invokation>: Intro( Str C<$name>, Str C<$description> )
+B<Invokation>: Intro(
+    Str C<$name>,
+    Str C<$description>
+)
+
+    # $name
+    $description
 
 =cut
 
@@ -128,7 +144,17 @@ sub Intro {
 
 =func Concat
 
-B<Invokation>: Concat( Str C<@blocks> )
+B<Invokation>: Concat(
+    Str C<@blocks>
+)
+
+    $block[0]
+    
+    $block[1]
+    
+    $block[2]
+    
+    ...
 
 =cut
 
@@ -138,7 +164,14 @@ sub Concat {
 
 =func Text
 
-B<Invkokation>: Text( Str C<@strings> )
+B<Invokation>: Text(
+    Str C<@strings>
+)
+
+    $string[0]
+    $string[1]
+    $string[2]
+    ...
 
 =cut
 
@@ -148,7 +181,15 @@ sub Text {
 
 =func Code
 
-B<Invkokation>: Code( Str C<$code>, [ Str C<$lang> = C<''> ], [ Int C<$delimiters> = C<3> ] )
+B<Invokation>: Code(
+    Str C<$code>,
+    [ Str C<$lang> = C<''> ],
+    [ Int C<$delimiters> = C<3> ]
+)
+
+    ```$lang
+    $code
+    ```
 
 =cut
 
@@ -177,9 +218,17 @@ sub Definition {
 
 =func Group
 
-B<Invokation>: Group( Str C<$identifier>, Str | ArrayRef[ HashRef | Str ] C<$body>, [ Int C<$indent> ] )
+B<Invokation>: Group(
+    Str C<$identifier>,
+    Str|ArrayRef[HashRef|Str] C<$body>,
+    [ Int C<$indent> ]
+)
 
-If C<$body> is an ArrayRef, every item which is a HashRef will be passed to L</Resource>. 
+If C<$body> is an ArrayRef, every item which is a HashRef will be passed to L</Resource>.
+
+    # Group $identifier
+    
+    $body
 
 =cut
 
@@ -210,6 +259,18 @@ B<Invokation>: Resource(
 * See L</Model> for C<$model>
 * See L</Action> for C<$actions>
 
+    ## $method $uri
+    
+    $body
+
+    ## $identifier [$uri]
+    
+    $body
+
+    ## $uri
+    
+    $body
+
 =cut
 
 sub Resource {
@@ -238,9 +299,17 @@ sub Resource {
 
 =func Model
 
-B<Invokation>: Model( Str C<$media_type>, Str | HashRef C<$payload>, [ Int C<$indent> ] )
+B<Invokation>: Model(
+    Str C<$media_type>,
+    Str|HashRef C<$payload>,
+    [ Int C<$indent> ]
+)
 
 See L</Payload> if C<$payload> is a HashRef.
+
+    + Model ($media_type)
+    
+    $payload
 
 =cut
 
@@ -258,7 +327,14 @@ sub Model {
 
 =func Schema
 
-B<Invokation>: Schema( Str C<$body>, [ Int C<$indent> ] )
+B<Invokation>: Schema(
+    Str C<$body>,
+    [ Int C<$indent> ]
+)
+
+    + Schema
+    
+    $body
 
 =cut
 
@@ -273,7 +349,7 @@ B<Invokation>: Action(
     Str C<:$method>,
     Str C<:$uri>,
     Str C<:$identifier>,
-    Str | CodeRef C<:$body>,
+    Str|CodeRef C<:$body>,
     Int C<:$indent>,
     Int C<:$level>,
     Str C<:$relation>,
@@ -282,7 +358,7 @@ B<Invokation>: Action(
     ArrayRef C<:$request>,
     ArrayRef C<:$requests>,
     ArrayRef C<:$response>,
-    ArrayRef C<:$responses>,
+    ArrayRef C<:$responses>
 )
 
 =for :list
@@ -291,6 +367,18 @@ See L</Parameters> for C<$parameters>
 See L</Asset> for C<$assets>
 See L</Request> for C<$request> and C<$requests>
 See L</Response> for C<$response> and C<$responses>
+
+    ### $identifier [$method $uri]
+    
+    $body
+
+    ### $identifier [$method]
+    
+    $body
+
+    ### $method
+    
+    $body
 
 =cut
 
@@ -353,7 +441,7 @@ B<Invokation>: PayLoad(
     Str C<:$lang>,
     AnyRef C<:$yaml>,
     AnyRef C<:$json>,
-    Str C<:$schema>,
+    Str C<:$schema>
 )
 
 =for :list
@@ -361,6 +449,45 @@ B<Invokation>: PayLoad(
 * See L</Body_CODE> for C<$code> and C<$lang>
 * See L</Body_YAML> for C<$yaml>
 * See L</Body_JSON> for C<$json>
+
+Complete output:
+
+    $description
+    
+    + Headers
+            $key: $value
+    
+    + Body
+    
+    $body
+    
+    + Schema
+    
+    $schema
+
+With C<$code> and C<$lang>:
+
+    + Body
+    
+        ```$lang
+        $code
+        ```
+
+With C<$yaml>:
+
+    + Body
+    
+        ```yaml
+        $yaml
+        ```
+
+With C<$json>:
+
+    + Body
+
+        ```json
+        $json
+        ```
 
 =cut
 
@@ -387,9 +514,18 @@ sub Payload {
 
 =func Asset
 
-B<Invokation>: Asset( Str C<$keyword>, Str C<$identifier>, Str <:$type>, %payload )
+B<Invokation>: Asset(
+    Str C<$keyword>,
+    Str C<$identifier>,
+    Str C<:$type>,
+    C<%payload>
+)
 
 See L</Payload> for C<%payload>
+
+    # $keyword $identifier ($type)
+    
+    $payload
 
 =cut
 
@@ -403,7 +539,15 @@ sub Asset {
 
 =func Reference
 
-B<Invokation>: Reference( Str C<$keyword>, Str C<$identifier>, Str C<$reference> )
+B<Invokation>: Reference(
+    Str C<$keyword>,
+    Str C<$identifier>,
+    Str C<$reference>
+)
+
+    # $keyword $identifier
+    
+        [$reference][]
 
 =cut
 
@@ -414,7 +558,9 @@ sub Reference {
 
 =func Request
 
-B<Invokation>: Request( C<@args> )
+B<Invokation>: Request(
+    C<@args>
+)
 
 Calls L</Asset>( C<'Request'>, C<@args> )
 
@@ -427,7 +573,9 @@ sub Request {
 
 =func Request_Ref
 
-B<Invokation>: Request_Ref( C<@args> )
+B<Invokation>: Request_Ref(
+    C<@args>
+)
 
 Calls L</Reference>( C<'Request'>, C<@args> )
 
@@ -440,7 +588,9 @@ sub Request_Ref {
 
 =func Response
 
-B<Invokation>: Response( C<@args> )
+B<Invokation>: Response(
+    C<@args>
+)
 
 Calls L</Asset>( C<'Response'>, C<@args> )
 
@@ -453,7 +603,9 @@ sub Response {
 
 =func Response_Ref
 
-B<Invokation>: Response_Ref( C<@args> )
+B<Invokation>: Response_Ref(
+    C<@args>
+)
 
 Calls L</Reference>( C<'Response'>, C<@args> )
 
@@ -466,7 +618,13 @@ sub Response_Ref {
 
 =func Parameters
 
-B<Invokation>: Parameters( [ Str C<$name> => HashRef C<$options> ]* )
+B<Invokation>: Parameters(
+    [
+        Str C<$name>
+        =>
+        HashRef C<$options>
+    ]*
+)
 
 For every keypair, L</Parameter>(C<$name>, C<%$options>) will be called
 
@@ -490,10 +648,20 @@ B<Invokation>: Parameter(
     Str C<:$type>,
     Str C<:$enum>,
     Str C<:$shortdesc>,
-    Str | ArrayRef[ Str ] C<:$longdesc>,
+    Str|ArrayRef[Str] C<:$longdesc>,
     Str C<:$default>,
-    HashRef C<:$members>,
+    HashRef C<:$members>
 )
+
+    + $name: `$example` ($type, $required_or_optional) - $shortdesc
+    
+        $longdesc
+        
+        + Default: `$default`
+        
+        + Members
+            + `$key` - $value
+            + ...
 
 =cut
 
@@ -524,7 +692,17 @@ sub Parameter {
 
 =func Headers
 
-B<Invokation>: Headers( [ Str C<$key> => Str C<$value> ]* )
+B<Invokation>: Headers(
+    [
+        Str C<$key>
+        =>
+        Str C<$value>
+    ]*
+)
+
+    + Headers
+        $key: $value
+        ...
 
 =cut
 
@@ -542,7 +720,13 @@ sub Headers {
 
 =func Body
 
-B<Invokation>: Body( Str C<$body> )
+B<Invokation>: Body(
+    Str C<$body>
+)
+
+    + Body
+    
+            $body
 
 =cut
 
@@ -553,7 +737,16 @@ sub Body {
 
 =func Body_CODE
 
-B<Invokation>: Body_CODE( Str C<$code>, Str C<$lang> )
+B<Invokation>: Body_CODE(
+    Str C<$code>,
+    Str C<$lang>
+)
+
+    + Body
+    
+        ```$lang
+        $code
+        ```
 
 =cut
 
@@ -564,7 +757,15 @@ sub Body_CODE {
 
 =func Body_YAML
 
-B<Invokation>: Body_YAML( AnyRef C<$struct> )
+B<Invokation>: Body_YAML(
+    AnyRef C<$struct>
+)
+
+    + Body
+    
+        ```yaml
+        $struct
+        ```
 
 =cut
 
@@ -576,7 +777,15 @@ sub Body_YAML {
 
 =func Body_JSON
 
-B<Invokation>: Body_JSON( AnyRef C<$struct> )
+B<Invokation>: Body_JSON(
+    AnyRef C<$struct>
+)
+
+    + Body
+    
+        ```json
+        $struct
+        ```
 
 =cut
 
@@ -588,7 +797,11 @@ sub Body_JSON {
 
 =func Relation
 
-B<Invokation>: Relation( Str C<$link> )
+B<Invokation>: Relation(
+    Str C<$link>
+)
+
+    + Relation: $link
 
 =cut
 
