@@ -19,6 +19,7 @@ our @EXPORT_OK = qw/
     Body_JSON
     Body_YAML
     Code
+    Compile
     Concat
     Group
     Headers
@@ -123,6 +124,26 @@ sub _listitem {
 }
 
 use namespace::clean;
+
+=func Compile
+
+=cut
+
+sub Compile {
+    my $struct = shift;
+    my @Body;
+    push @Body => Meta(delete $struct->{host});
+    push @Body => Intro(delete $struct->{name}, delete $struct->{description});
+    foreach my $resource (@{ delete $struct->{resources} }) {
+        push @Body => Resource(%$resource);
+    }
+    if (my $groups = delete $struct->{groups}) {
+        foreach my $group (keys %$groups) {
+            push @Body => Group($group, delete $groups->{$group});
+        }
+    }
+    return _autoprint(wantarray, Concat(@Body));
+}
 
 =func Section
 
