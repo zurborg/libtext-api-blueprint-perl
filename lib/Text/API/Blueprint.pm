@@ -6,10 +6,8 @@ package Text::API::Blueprint;
 
 use Class::Load qw(load_class);
 use Exception::Delayed;
-
-use namespace::clean;
-
 use Exporter qw(import);
+use namespace::clean;
 
 # VERSION
 
@@ -61,7 +59,7 @@ sub _autoprint {
         if (ref $Autoprint eq 'SCALAR') {
             $$Autoprint .= $str;
         } elsif (ref $Autoprint eq 'GLOB') {
-            print *$Autoprint $str;
+            print $Autoprint $str;
         } else {
             print $str;
         }
@@ -78,7 +76,7 @@ sub _rpl {
     return $str;
 }
 
-sub _trim(_) {
+sub _trim {
     _rpl( qr{\s+}, +shift );
 }
 
@@ -90,7 +88,7 @@ sub _indent {
     return $indent . $str;
 }
 
-sub _flatten(_) {
+sub _flatten {
     my ($str) = @_;
     my ($pre) = ( $str =~ m{^(\s*)\S} );
     return $str unless $pre;
@@ -193,11 +191,11 @@ B<Invokation>: Concat(
 )
 
     $block[0]
-    
+
     $block[1]
-    
+
     $block[2]
-    
+
     ...
 
 =cut
@@ -257,7 +255,7 @@ B<Invokation>: Group(
 If C<$body> is an ArrayRef, every item which is a HashRef will be passed to L</Resource>.
 
     # Group $identifier
-    
+
     $body
 
 =cut
@@ -297,19 +295,19 @@ B<Invokation>: Resource(
 With C<$method> and C<$uri>
 
     ## $method $uri
-    
+
     $body
 
 With C<$identifier> and C<$uri>
 
     ## $identifier [$uri]
-    
+
     $body
 
 With C<$uri>
 
     ## $uri
-    
+
     $body
 
 =cut
@@ -349,7 +347,7 @@ B<Invokation>: Model(
 See L</Payload> if C<$payload> is a HashRef.
 
     + Model ($media_type)
-    
+
     $payload
 
 =cut
@@ -374,7 +372,7 @@ B<Invokation>: Schema(
 )
 
     + Schema
-    
+
     $body
 
 =cut
@@ -419,19 +417,19 @@ B<Invokation>: Action(
 With C<$identifier> C<$method> and C<$uri>:
 
     ### $identifier [$method $uri]
-    
+
     $body
 
 With C<$identifier> and C<$method>:
 
     ### $identifier [$method]
-    
+
     $body
 
 With C<$method>:
 
     ### $method
-    
+
     $body
 
 =cut
@@ -473,7 +471,7 @@ sub Action {
         }
         $body = Concat(@body) if @body;
     }
-    
+
     if ($identifier and $method and $uri) {
         return _autoprint(wantarray, _header($level, "$identifier [$method $uri]", $body, $indent));
     } elsif ($identifier and $method) {
@@ -513,22 +511,22 @@ B<Invokation>: Payload(
 Complete output:
 
     $description
-    
+
     + Headers
             $key: $value
-    
+
     + Body
-    
+
     $body
-    
+
     + Schema
-    
+
     $schema
 
 With C<$code> and C<$lang>:
 
     + Body
-    
+
         ```$lang
         $code
         ```
@@ -536,7 +534,7 @@ With C<$code> and C<$lang>:
 With C<$yaml>:
 
     + Body
-    
+
         ```yaml
         $yaml
         ```
@@ -584,7 +582,7 @@ B<Invokation>: Asset(
 See L</Payload> for C<%payload>
 
     # $keyword $identifier ($type)
-    
+
     $payload
 
 =cut
@@ -606,7 +604,7 @@ B<Invokation>: Reference(
 )
 
     # $keyword $identifier
-    
+
         [$reference][]
 
 =cut
@@ -714,11 +712,11 @@ B<Invokation>: Parameter(
 )
 
     + $name: `$example` ($type, $required_or_optional) - $shortdesc
-    
+
         $longdesc
-        
+
         + Default: `$default`
-        
+
         + Members
             + `$key` - $value
             + ...
@@ -738,7 +736,7 @@ sub Parameter {
     if (defined $enum) {
         $type = "enum[$enum]";
     }
-    
+
     my @longdesc = (ref($longdesc) eq 'ARRAY') ? @$longdesc : [ split /\n{2,}/ => $longdesc ];
     my @itembody = (@longdesc);
     push @itembody => _listitem("Default: `$default`") if defined $default;
@@ -785,7 +783,7 @@ B<Invokation>: Body(
 )
 
     + Body
-    
+
             $body
 
 =cut
@@ -803,7 +801,7 @@ B<Invokation>: Body_CODE(
 )
 
     + Body
-    
+
         ```$lang
         $code
         ```
@@ -822,7 +820,7 @@ B<Invokation>: Body_YAML(
 )
 
     + Body
-    
+
         ```yaml
         $struct
         ```
@@ -842,7 +840,7 @@ B<Invokation>: Body_JSON(
 )
 
     + Body
-    
+
         ```json
         $struct
         ```
