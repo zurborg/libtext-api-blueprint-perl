@@ -904,7 +904,8 @@ B<Invokation>: Body_JSON(
 sub Body_JSON {
     my ($struct) = @_;
     load_class('JSON');
-    return _autoprint(wantarray, Body_CODE(JSON->new->utf8->pretty->allow_nonref->encode($struct), 'json'));
+    our $JSON //= JSON->new->utf8->pretty->allow_nonref->convert_blessed;
+    return _autoprint(wantarray, Body_CODE($JSON->encode($struct), 'json'));
 }
 
 =func Relation
