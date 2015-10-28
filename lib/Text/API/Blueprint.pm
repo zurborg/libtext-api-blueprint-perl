@@ -14,6 +14,7 @@ use namespace::clean;
 our @EXPORT_OK = qw/
     Action
     Asset
+    Attributes
     Body
     Body_CODE
     Body_JSON
@@ -401,6 +402,38 @@ B<Invokation>: Schema(
 sub Schema {
     my ($body, $indent) = @_;
     return _autoprint(wantarray, _listitem("Schema", $body, $indent));
+}
+
+=func Attributes
+
+=cut
+
+sub Attributes {
+    my ($typedef, $attrs) = @_;
+    if ($attrs) {
+        my @attrs;
+        foreach my $attr (keys %$attrs) {
+            my %def = %{ $attrs->{$attr} };
+            my $str = "$attr";
+            if (my $example = delete $def{example}) {
+                $str .= ": $example";
+            }
+            if (my $type = delete $def{type}) {
+                $str .= " ($type)";
+            }
+            if (my $desc = delete $def{description}) {
+                $str .= " - $desc";
+            }
+            push @attrs => $str;
+        }
+        {
+            use Data::Dumper;
+            print Dumper(\@attrs);
+        }
+        return _autoprint(wantarray, _listitem("Attributes ($typedef)", map { _listitem($_) } @attrs));
+    } else {
+        return _autoprint(wantarray, _listitem("Attributes ($typedef)"));
+    }
 }
 
 =func Action
