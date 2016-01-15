@@ -383,7 +383,7 @@ sub Schema : Exportable(singles) {
 
 # Attributes:
 sub Attributes : Exportable(singles) {
-    my ($typedef, $attrs) = @_;
+    my ($typedef, $attrs, $indent) = @_;
     if ($attrs) {
         my @attrs;
         foreach my $attr (sort keys %$attrs) {
@@ -735,7 +735,6 @@ B<Invokation>: Parameter(
     Str C<$name>,
     Str C<:$example>,
     Bool C<:$required>,
-    Bool C<:$optional>,
     Str C<:$type>,
     Str C<:$enum>,
     Str C<:$shortdesc>,
@@ -759,27 +758,37 @@ B<Invokation>: Parameter(
 # Parameter:
 sub Parameter : Exportable(singles) {
     my ($name, %opts) = @_;
-    my ($example_value, $required, $optional, $type, $enum, $shortdesc, $longdesc, $default, $members) = @opts{qw{ example required optional type enum shortdesc longdesc default members }};
-    my $constraint = 'optional';
-    if (defined $required) {
-        $constraint = $required ? 'required' : 'optional';
-    }
-    if (defined $optional) {
-        $constraint = $optional ? 'optional' : 'required';
-    }
+    my ($example_value, $required, $type, $enum, $shortdesc, $longdesc, $default, $members) = @opts{qw{ example required type enum shortdesc longdesc default members }};
+
+    my $constraint = $required ? 'required' : 'optional';
+
     if (defined $enum) {
         $type = "enum[$enum]";
     }
 
-    my @longdesc = (ref($longdesc) eq 'ARRAY') ? @$longdesc : [ split /\n{2,}/ => $longdesc ];
-    my @itembody = (@longdesc);
+    my @itembody;
+    
+    if (ref $longdesc eq 'ARRAY') {
+        push @itembody => @$longdesc;
+    } elsif (defined $longdesc) {
+        push @itembody => split /(\r?\n){2,}/, $longdesc;
+    }
+
+    my $str = "$name:";
+    $str .= " `$example_value`" if defined $example_value;
+    $str .= " ($type, $constraint)" if defined $type;
+    $str .= " - $shortdesc" if defined $shortdesc;
+
     push @itembody => _listitem("Default: `$default`") if defined $default;
+
     if (defined $members) {
         $members = join "\n", map { "+ `$_` - ".$members->{$_} } sort keys %$members;
         push @itembody => _listitem("Members", $members) if length $members;
     }
-    my $itembody = _text(@itembody);
-    return _autoprint(wantarray, _listitem("$name: `$example_value` ($type, $constraint) - $shortdesc", $itembody));
+
+    my $itembody = Concat(@itembody);
+
+    return _autoprint(wantarray, _listitem($str, $itembody));
 }
 
 =func Headers
