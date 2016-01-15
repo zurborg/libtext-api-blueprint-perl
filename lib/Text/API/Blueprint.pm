@@ -190,7 +190,7 @@ B<Invokation>: Concat(
 
 # Concat:
 sub Concat : Exportable(singles) {
-    return _autoprint(wantarray, join "", map { "$_\n\n" } map _trim, grep defined, @_);
+    return _autoprint(wantarray, join "\n\n", map { _trim($_) } grep defined, @_);
 }
 
 =func Text
@@ -815,8 +815,9 @@ sub Headers : Exportable(singles) {
         $name =~ s{_}{-}g;
         $name =~ s{-+([^-]+)}{'-'.ucfirst($1)}eg;
         $name = ucfirst($name);
-        $body .= "    $name: $value";
+        $body .= "\n    $name: $value";
     }
+    $body =~ s{^\n+}{}s;
     return _autoprint(wantarray, _listitem('Headers', $body));
 }
 
