@@ -102,7 +102,7 @@ sub Compile : Exportable(simple) {
         push @Body => Resource(%$resource);
     }
     if (my $groups = delete $struct->{groups}) {
-        foreach my $group (keys %$groups) {
+        foreach my $group (sort keys %$groups) {
             push @Body => Group($group, delete $groups->{$group});
         }
     }
@@ -386,7 +386,7 @@ sub Attributes : Exportable(singles) {
     my ($typedef, $attrs) = @_;
     if ($attrs) {
         my @attrs;
-        foreach my $attr (keys %$attrs) {
+        foreach my $attr (sort keys %$attrs) {
             my %def = %{ $attrs->{$attr} };
             my $str = "$attr";
             if (my $example = delete $def{example}) {
