@@ -83,7 +83,10 @@ sub _listitem {
     return $str;
 }
 
-use namespace::clean;
+sub _list {
+    my @items = @_;
+    return join "\n" => map { '+ '._trim($_) } @items;
+}
 
 =func Compile
 
@@ -397,11 +400,7 @@ sub Attributes : Exportable(singles) {
             }
             push @attrs => $str;
         }
-        {
-            use Data::Dumper;
-            print Dumper(\@attrs);
-        }
-        return _autoprint(wantarray, _listitem("Attributes ($typedef)", map { _listitem($_) } @attrs));
+        return _autoprint(wantarray, _listitem("Attributes ($typedef)", _list(@attrs), $indent));
     } else {
         return _autoprint(wantarray, _listitem("Attributes ($typedef)"));
     }
