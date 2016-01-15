@@ -6,54 +6,13 @@ package Text::API::Blueprint;
 
 use Class::Load qw(load_class);
 use Exception::Delayed;
-use Exporter qw(import);
-use namespace::clean;
+use Carp qw(croak confess);
+use Exporter::Attributes qw(import);
 
 # VERSION
 
-our @EXPORT_OK = qw/
-    Action
-    Asset
-    Attributes
-    Body
-    Body_CODE
-    Body_JSON
-    Body_YAML
-    Code
-    Compile
-    Concat
-    Group
-    Headers
-    Intro
-    Meta
-    Model
-    Parameter
-    Parameters
-    Payload
-    Reference
-    Relation
-    Request
-    Request_Ref
-    Resource
-    Response
-    Response_Ref
-    Schema
-    Section
-    Text
-/;
-our %EXPORT_TAGS = (
-    all => [ @EXPORT_OK ],
-    minimal => [qw[ Meta Intro Resource Group ]],
-    resource => [qw[ Resource Parameters Model Action ]],
-    model => [qw[ Model Headers Body Schema ]],
-    action => [qw[ Action Relation Parameters Asset Reference Request Response ]],
-    helpers => [qw[ Code Concat Section Text ]],
-);
-
 our $Autoprint = 0;
 our $Offset = 0;
-
-no namespace::clean;
 
 sub _autoprint {
     my ($wantarray, $str) = @_;
@@ -130,7 +89,8 @@ use namespace::clean;
 
 =cut
 
-sub Compile {
+# Compile: Meta Intro Resource Group Concat
+sub Compile : Exportable(simple) {
     my $struct = shift;
     my @Body;
     push @Body => Meta(delete $struct->{host});
@@ -157,7 +117,8 @@ Increments header offset by C<$offset> for everything executed in C<$coderef>.
 
 =cut
 
-sub Section {
+# Section:
+sub Section : Exportable(singles) {
     my ($coderef, $offset) = @_;
     $offset //= 1;
     $Offset += $offset;
@@ -182,7 +143,8 @@ B<Invokation>: Meta(
 
 =cut
 
-sub Meta {
+# Meta:
+sub Meta : Exportable(singles) {
     my $host = shift;
     my $str = "FORMAT: 1A8\n";
     $str .= "HOST: $host\n" if defined $host;
@@ -201,7 +163,8 @@ B<Invokation>: Intro(
 
 =cut
 
-sub Intro {
+# Intro:
+sub Intro : Exportable(singles) {
     my ($name, $description) = @_;
     return _autoprint(wantarray, _header(1, $name, $description));
 }
@@ -222,7 +185,8 @@ B<Invokation>: Concat(
 
 =cut
 
-sub Concat {
+# Concat:
+sub Concat : Exportable(singles) {
     return _autoprint(wantarray, join "", map { "$_\n\n" } map _trim, grep defined, @_);
 }
 
@@ -239,7 +203,8 @@ B<Invokation>: Text(
 
 =cut
 
-sub Text {
+# Text: Concat
+sub Text : Exportable(helpers) {
     map _autoprint(wantarray, Concat(map _flatten, map { s{[\r\n]+}{\n}r } @_));
 }
 
@@ -257,7 +222,8 @@ B<Invokation>: Code(
 
 =cut
 
-sub Code {
+# Code:
+sub Code : Exportable(singles) {
     my ($code, $lang, $delimiters) = @_;
     $code = _flatten($code);
     $lang //= '';
@@ -282,7 +248,8 @@ If C<$body> is an ArrayRef, every item which is a HashRef will be passed to L</R
 
 =cut
 
-sub Group {
+# Group: Concat Resource
+sub Group : Exportable(minimal) {
     my ($identifier, $body, $indent) = @_;
     if (ref $body eq 'ARRAY') {
         $body = Concat(map { (ref($_) eq 'HASH') ? Resource(%$_) : $_ } @$body);
@@ -334,7 +301,8 @@ With C<$uri>
 
 =cut
 
-sub Resource {
+# Resource: Sesction Parameters Model Action
+sub Resource : Exportable(resource) {
     my %args = @_;
     my ($method, $uri, $identifier, $body, $indent, $level, $parameters, $model, $actions) = @args{qw{ method uri identifier body indent level parameters model actions }};
     $level //= 2;
@@ -374,7 +342,8 @@ See L</Payload> if C<$payload> is a HashRef.
 
 =cut
 
-sub Model {
+# Model: Payload
+sub Model : Exportable(resource) {
     if (@_ == 1 and ref $_[0] eq 'HASH') {
         my $args = shift;
         my $type = delete $args->{type};
@@ -399,7 +368,8 @@ B<Invokation>: Schema(
 
 =cut
 
-sub Schema {
+# Schema:
+sub Schema : Exportable(singles) {
     my ($body, $indent) = @_;
     return _autoprint(wantarray, _listitem("Schema", $body, $indent));
 }
@@ -408,7 +378,8 @@ sub Schema {
 
 =cut
 
-sub Attributes {
+# Attributes:
+sub Attributes : Exportable(singles) {
     my ($typedef, $attrs) = @_;
     if ($attrs) {
         my @attrs;
@@ -488,7 +459,8 @@ With C<$method>:
 
 =cut
 
-sub Action {
+# Action: Relation Parameters Reference Asset Request_Ref Request Response_Ref Response Concat
+sub Action : Exportable() {
     my %args = @_;
     my ($method, $uri, $identifier, $body, $indent, $level, $relation, $parameters, $assets, $requests, $responses, $request, $response) = @args{qw{ method uri identifier body indent level relation parameters assets requests responses request response }};
     $level //= 3;
@@ -603,7 +575,8 @@ With C<$json>:
 
 =cut
 
-sub Payload {
+# Payload: Headers Body Body_CODE Body_YAML Body_JSON Schema Concat
+sub Payload : Exportable() {
     my %args = @_;
     my @body;
     push @body => delete $args{description} if exists $args{description};
@@ -641,7 +614,8 @@ See L</Payload> for C<%payload>
 
 =cut
 
-sub Asset {
+# Asset: Payload
+sub Asset : Exportable(singles) {
     my ($keyword, $identifier, %payload) = @_;
     my $str = "$keyword $identifier";
     my $media_type = delete $payload{type};
@@ -663,7 +637,8 @@ B<Invokation>: Reference(
 
 =cut
 
-sub Reference {
+# Reference:
+sub Reference : Exportable(singles) {
     my ($keyword, $identifier, $reference) = @_;
     return _autoprint(wantarray, _listitem("$keyword $identifier", "[$reference][]"));
 }
@@ -678,7 +653,8 @@ Calls L</Asset>( C<'Request'>, C<@args> )
 
 =cut
 
-sub Request {
+# Request: Asset
+sub Request : Exportable() {
     unshift @_ => 'Request';
     goto &Asset;
 }
@@ -693,7 +669,8 @@ Calls L</Reference>( C<'Request'>, C<@args> )
 
 =cut
 
-sub Request_Ref {
+# Request_Ref: Reference
+sub Request_Ref : Exportable() {
     unshift @_ => 'Request';
     goto &Reference;
 }
@@ -708,7 +685,8 @@ Calls L</Asset>( C<'Response'>, C<@args> )
 
 =cut
 
-sub Response {
+# Response: Asset
+sub Response : Exportable() {
     unshift @_ => 'Response';
     goto &Asset;
 }
@@ -723,7 +701,8 @@ Calls L</Reference>( C<'Response'>, C<@args> )
 
 =cut
 
-sub Response_Ref {
+# Response_Ref: Reference
+sub Response_Ref : Exportable() {
     unshift @_ => 'Response';
     goto &Reference;
 }
@@ -742,7 +721,8 @@ For every keypair, L</Parameter>(C<$name>, C<%$options>) will be called
 
 =cut
 
-sub Parameters {
+# Parameters: Parameter
+sub Parameters : Exportable() {
     my $body = '';
     while (my ($name, $opts) = (shift, shift)) {
         $body .= Parameter($name, %$opts);
@@ -777,7 +757,8 @@ B<Invokation>: Parameter(
 
 =cut
 
-sub Parameter {
+# Parameter:
+sub Parameter : Exportable(singles) {
     my ($name, %opts) = @_;
     my ($example_value, $required, $optional, $type, $enum, $shortdesc, $longdesc, $default, $members) = @opts{qw{ example required optional type enum shortdesc longdesc default members }};
     my $constraint = 'optional';
@@ -818,7 +799,8 @@ B<Invokation>: Headers(
 
 =cut
 
-sub Headers {
+# Headers:
+sub Headers : Exportable(singles) {
     my $body = '';
     while (@_ and my ($name, $value) = (shift(@_), shift(@_))) {
         $name = lc($name =~ s{([a-z])([A-Z])}{$1-$2}gr);
@@ -842,7 +824,8 @@ B<Invokation>: Body(
 
 =cut
 
-sub Body {
+# Body:
+sub Body : Exportable(singles) {
     my $body = _flatten(shift);
     return _autoprint(wantarray, _listitem('Body', $body, 8));
 }
@@ -862,7 +845,8 @@ B<Invokation>: Body_CODE(
 
 =cut
 
-sub Body_CODE {
+# Body_CODE: Code
+sub Body_CODE : Exportable() {
     my ($code, $lang) = @_;
     return _autoprint(wantarray, _listitem('Body', Code(_flatten($code), $lang)));
 }
@@ -881,7 +865,8 @@ B<Invokation>: Body_YAML(
 
 =cut
 
-sub Body_YAML {
+# Body_YAML: Body_CODE
+sub Body_YAML : Exportable() {
     my ($struct) = @_;
     load_class('YAML::Any');
     return _autoprint(wantarray, Body_CODE(YAML::Any::Dump($struct), 'yaml'));
@@ -901,7 +886,8 @@ B<Invokation>: Body_JSON(
 
 =cut
 
-sub Body_JSON {
+# Body_JSON: Body_CODE
+sub Body_JSON : Exportable() {
     my ($struct) = @_;
     load_class('JSON');
     our $JSON //= JSON->new->utf8->pretty->allow_nonref->convert_blessed;
@@ -918,7 +904,8 @@ B<Invokation>: Relation(
 
 =cut
 
-sub Relation {
+# Relation:
+sub Relation : Exportable(singles) {
     my $link = shift;
     return _autoprint(wantarray, _listitem("Relation: $link"));
 }
