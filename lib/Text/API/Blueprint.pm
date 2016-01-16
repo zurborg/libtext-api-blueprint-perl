@@ -208,7 +208,7 @@ B<Invokation>: Text(
 
 # Text: Concat
 sub Text : Exportable(helpers) {
-    map _autoprint(wantarray, Concat(map _flatten, map { s{[\r\n]+}{\n}r } @_));
+    return _autoprint(wantarray, Concat(map { _flatten($_) } map { s{[\r\n]+}{\n}gr } @_));
 }
 
 =func Code
