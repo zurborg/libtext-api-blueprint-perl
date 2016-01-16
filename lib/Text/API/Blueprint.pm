@@ -723,7 +723,8 @@ For every keypair, L</Parameter>(C<$name>, C<%$options>) will be called
 # Parameters: Parameter
 sub Parameters : Exportable() {
     my $body = '';
-    while (my ($name, $opts) = (shift, shift)) {
+    while (@_) {
+        my ($name, $opts) = (shift, shift);
         $body .= Parameter($name, %$opts);
     }
     return _autoprint(wantarray, _listitem('Parameters', $body));
