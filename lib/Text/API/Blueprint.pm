@@ -458,7 +458,7 @@ With C<$method>:
 
 =cut
 
-# Action: Relation Parameters Reference Asset Request_Ref Request Response_Ref Response Concat
+# Action: Section Relation Parameters Reference Asset Request_Ref Request Response_Ref Response Concat
 sub Action : Exportable() {
     my %args = @_;
     my ($method, $uri, $identifier, $body, $indent, $level, $relation, $parameters, $assets, $requests, $responses, $request, $response) = @args{qw{ method uri identifier body indent level relation parameters assets requests responses request response }};
