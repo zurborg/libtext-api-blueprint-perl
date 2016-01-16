@@ -1,9 +1,9 @@
 #!perl
 
 use t::tests;
-use Text::API::Blueprint qw(Meta Intro Concat Code Schema Attributes Reference Parameter Headers Body Relation);
+use Text::API::Blueprint qw(Meta Intro Concat Code Schema Attributes Reference Headers Body Relation);
 
-plan tests => 12;
+plan tests => 11;
 
 tdt(Meta('localhost') => <<EOT, 'Meta');
 FORMAT: 1A8
@@ -67,26 +67,6 @@ tdt(Reference('foo', 'bar', 'baz') => <<EOT, 'Reference');
 + foo bar
 
     [baz][]
-
-EOT
-
-tdt(Parameter('foo',
-    (map {($_=>$_)} qw(example required type enum shortdesc longdesc default)),
-    members => {
-        foo => 'foof',
-        bar => 'barf',
-    }
-) => <<EOT, 'Parameter');
-+ foo: `example` (enum[enum], required) - shortdesc
-
-    longdesc
-    
-    + Default: `default`
-    
-    + Members
-    
-        + `bar` - barf
-        + `foo` - foof
 
 EOT
 
