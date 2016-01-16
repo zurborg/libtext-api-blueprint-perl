@@ -755,7 +755,7 @@ B<Invokation>: Parameter(
 
 =cut
 
-# Parameter:
+# Parameter: Concat
 sub Parameter : Exportable(singles) {
     my ($name, %opts) = @_;
     my ($example_value, $required, $type, $enum, $shortdesc, $longdesc, $default, $members) = @opts{qw{ example required type enum shortdesc longdesc default members }};
