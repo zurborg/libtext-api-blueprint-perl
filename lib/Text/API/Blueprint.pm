@@ -320,6 +320,7 @@ sub Resource : Exportable(resource) {
         push @body => Parameters(%$parameters) if ref $parameters eq 'HASH';
         push @body => Model($model) if ref $model eq 'HASH';
         push @body => map { Action(%$_) } @$actions if ref $actions eq 'ARRAY';
+        $body = Concat(@body);
     }
     if ($method and $uri) {
         return _autoprint(wantarray, _header($level, "$method $uri", $body, $indent));
