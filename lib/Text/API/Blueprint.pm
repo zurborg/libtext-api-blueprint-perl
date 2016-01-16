@@ -24,6 +24,7 @@ sub _autoprint {
         } else {
             print $str;
         }
+        return;
     } else {
         return $str;
     }
