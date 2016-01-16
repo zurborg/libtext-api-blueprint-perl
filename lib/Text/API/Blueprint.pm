@@ -772,7 +772,7 @@ sub Parameter : Exportable(singles) {
     }
 
     my @itembody;
-    
+
     if (ref $longdesc eq 'ARRAY') {
         push @itembody => @$longdesc;
     } elsif (defined $longdesc) {
