@@ -7,6 +7,8 @@ use constant EOL => "\n";
 
 plan tests => 6;
 
+################################################################################
+
 tdt(Text(qw(a b c)).EOL, <<EOT, 'Text');
 a
 
@@ -14,6 +16,8 @@ b
 
 c
 EOT
+
+################################################################################
 
 tdt(Body_CODE('foo') => <<EOT, 'Body_CODE (1)');
 + Body
@@ -26,6 +30,8 @@ tdt(Body_CODE('foo') => <<EOT, 'Body_CODE (1)');
 
 EOT
 
+################################################################################
+
 tdt(Body_CODE('foo', 'bar') => <<EOT, 'Body_CODE (2)');
 + Body
 
@@ -37,6 +43,8 @@ tdt(Body_CODE('foo', 'bar') => <<EOT, 'Body_CODE (2)');
 
 EOT
 
+################################################################################
+
 tdt(Request_Ref('foo', 'bar') => <<EOT, 'Request_Ref');
 + Request foo
 
@@ -44,12 +52,16 @@ tdt(Request_Ref('foo', 'bar') => <<EOT, 'Request_Ref');
 
 EOT
 
+################################################################################
+
 tdt(Response_Ref('foo', 'bar') => <<EOT, 'Response_Ref');
 + Response foo
 
     [bar][]
 
 EOT
+
+################################################################################
 
 tdt(Parameter('foo',
     (map {($_=>$_)} qw(example required type enum shortdesc longdesc default)),
@@ -70,5 +82,7 @@ tdt(Parameter('foo',
         + `foo` - foof
 
 EOT
+
+################################################################################
 
 done_testing;
