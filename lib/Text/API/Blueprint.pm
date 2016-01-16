@@ -51,9 +51,11 @@ sub _indent {
 
 sub _flatten {
     my ($str) = @_;
+    return unless defined $str;
     my ($pre) = ( $str =~ m{^(\s*)\S} );
     return $str unless $pre;
-    $str =~ s{^\Q$pre\E}{}rmg;
+    $str =~ s{^\Q$pre\E}{}mg;
+    return $str;
 }
 
 sub _arrayhash {
