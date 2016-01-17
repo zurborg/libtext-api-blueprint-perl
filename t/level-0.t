@@ -58,7 +58,7 @@ EOT
 
 ################################################################################
 
-tdt(Attributes('foo', {
+tdt(Attributes('foo', [
     a => {
         example => 'b',
         type => 'c',
@@ -69,7 +69,7 @@ tdt(Attributes('foo', {
         type => 'g',
         description => 'h'
     },
-}, 3) => <<EOT, 'Attributes (2)');
+], 3) => <<EOT, 'Attributes (2)');
 + Attributes (foo)
 
    + a: b (c) - d
@@ -88,11 +88,11 @@ EOT
 
 ################################################################################
 
-tdt(Headers(
+tdt(Headers([
     'foo' => 1,
     'x-foo' => 2,
     'FooBarBaz' => 3,
-) => <<EOT, 'Headers');
+]) => <<EOT, 'Headers');
 + Headers
 
         Foo: 1

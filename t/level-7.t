@@ -9,44 +9,44 @@ plan tests => 6;
 
 ################################################################################
 
-tdt(Resource(
+tdt(Resource({
     map {$_=>$_} qw(uri)
-), <<'EOT', 'Request uri');
+}), <<'EOT', 'Request uri');
 ## uri
 
 EOT
 
 ################################################################################
 
-tdt(Resource(
+tdt(Resource({
     map {$_=>$_} qw(identifier uri)
-), <<'EOT', 'Request identifier uri');
+}), <<'EOT', 'Request identifier uri');
 ## identifier [uri]
 
 EOT
 
 ################################################################################
 
-tdt(Resource(
+tdt(Resource({
     map {$_=>$_} qw(method uri)
-), <<'EOT', 'Request method uri');
+}), <<'EOT', 'Request method uri');
 ## method uri
 
 EOT
 
 ################################################################################
 
-tdt(Resource(
-    parameters => {
+tdt(Resource({
+    parameters => [
         foo => {
             (map {($_=>$_)} qw(example required type enum shortdesc longdesc default)),
-            members => {
+            members => [
                 bar => 'baz',
-            }
+            ]
         },
-    },
+    ],
     map {$_=>$_} qw(uri)
-), <<'EOT', 'Request parameters');
+}), <<'EOT', 'Request parameters');
 ## uri
 
 + Parameters
@@ -65,17 +65,17 @@ EOT
 
 ################################################################################
 
-tdt(Resource(
+tdt(Resource({
     model => {
         type => 'type',
         description => 'description',
-        headers => { foo => 'bar' },
+        headers => [ foo => 'bar' ],
         code => 'code',
         lang => 'lang',
         schema => "schema",
     },
     map {$_=>$_} qw(uri)
-), <<'EOT', 'Request model');
+}), <<'EOT', 'Request model');
 ## uri
 
 + Model (type)
@@ -100,14 +100,14 @@ EOT
 
 ################################################################################
 
-tdt(Resource(
+tdt(Resource({
     actions => [{
         method => 'foo'
     },{
         method => 'bar'
     }],
     map {$_=>$_} qw(uri)
-), <<'EOT', 'Request action');
+}), <<'EOT', 'Request action');
 ## uri
 
 ### foo

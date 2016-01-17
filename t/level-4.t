@@ -12,7 +12,7 @@ plan tests => 4;
 tdt(Model({
     type => 'type',
     description => 'description',
-    headers => { foo => 'bar' },
+    headers => [ foo => 'bar' ],
     code => 'code',
     lang => 'lang',
     schema => "schema",
@@ -41,7 +41,7 @@ EOT
 
 tdt(Model('type', {
     description => 'description',
-    headers => { foo => 'bar' },
+    headers => [ foo => 'bar' ],
     code => 'code',
     lang => 'lang',
     schema => "schema",
@@ -77,15 +77,14 @@ EOT
 
 ################################################################################
 
-tdt(Asset(
-    keyword => 'identifier',
+tdt(Asset(keyword => 'identifier', {
     type => 'type',
     description => 'description',
-    headers => { foo => 'bar' },
+    headers => [ foo => 'bar' ],
     code => 'code',
     lang => 'lang',
     schema => "schema",
-), <<'EOT', 'Asset');
+}), <<'EOT', 'Asset');
 + keyword identifier (type)
 
     description

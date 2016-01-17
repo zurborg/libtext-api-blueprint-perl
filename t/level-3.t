@@ -9,13 +9,13 @@ plan tests => 1;
 
 ################################################################################
 
-tdt(Payload(
+tdt(Payload({
     description => 'description',
-    headers => { foo => 'bar' },
+    headers => [ foo => 'bar' ],
     code => 'code',
     lang => 'lang',
     schema => "schema",
-).EOL, <<'EOT', 'Payload');
+}).EOL, <<'EOT', 'Payload');
 description
 
 + Headers

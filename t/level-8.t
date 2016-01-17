@@ -16,9 +16,9 @@ tdt(Compile({
     resources => [{
         uri => 'uri'
     }],
-    groups => {
+    groups => [
         foo => 'bar'
-    }
+    ]
 }).EOL, <<'EOT', 'Compile');
 FORMAT: 1A8
 HOST: host

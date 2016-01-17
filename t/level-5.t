@@ -9,15 +9,14 @@ plan tests => 2;
 
 ################################################################################
 
-tdt(Request(
-    'identifier',
+tdt(Request('identifier', {
     type => 'type',
     description => 'description',
-    headers => { foo => 'bar' },
+    headers => [ foo => 'bar' ],
     code => 'code',
     lang => 'lang',
     schema => "schema",
-), <<'EOT', 'Request');
+}), <<'EOT', 'Request');
 + Request identifier (type)
 
     description
@@ -40,15 +39,14 @@ EOT
 
 ################################################################################
 
-tdt(Response(
-    'identifier',
+tdt(Response('identifier', {
     type => 'type',
     description => 'description',
-    headers => { foo => 'bar' },
+    headers => [ foo => 'bar' ],
     code => 'code',
     lang => 'lang',
     schema => "schema",
-), <<'EOT', 'Response');
+}), <<'EOT', 'Response');
 + Response identifier (type)
 
     description

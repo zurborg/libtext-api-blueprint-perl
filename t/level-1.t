@@ -63,13 +63,13 @@ EOT
 
 ################################################################################
 
-tdt(Parameter('foo',
+tdt(Parameter('foo', {
     (map {($_=>$_)} qw(example required type enum shortdesc longdesc default)),
-    members => {
+    members => [
         foo => 'foof',
         bar => 'barf',
-    }
-) => <<EOT, 'Parameter');
+    ]
+}) => <<EOT, 'Parameter');
 + foo: `example` (enum[enum], required) - shortdesc
 
     longdesc
@@ -78,8 +78,8 @@ tdt(Parameter('foo',
     
     + Members
     
-        + `bar` - barf
         + `foo` - foof
+        + `bar` - barf
 
 EOT
 

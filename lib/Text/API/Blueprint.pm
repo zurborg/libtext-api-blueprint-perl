@@ -59,17 +59,6 @@ sub _flatten {
     return $str;
 }
 
-sub _arrayhash {
-    my %hash;
-    while (@_) {
-        my ( $key, $val ) = ( shift, shift );
-        next unless defined $key;
-        $hash{$key} //= [];
-        push @{ $hash{$key} } => $val;
-    }
-    return %hash;
-}
-
 sub _header {
     my ($level, $title, $body, $indent) = @_;
     my $str = '#' x ($level + $Offset);
@@ -91,6 +80,18 @@ sub _list {
     return join "\n" => map { '+ '._trim($_) } @items;
 }
 
+sub _arrayhashloop {
+    my ($arrayhash, $coderef) = @_;
+    return unless ref $arrayhash eq 'ARRAY';
+    my @list = @$arrayhash;
+    my @result;
+    while (@list) {
+        my ($key, $val) = splice @list, 0 => 2;
+        push @result => $coderef->($key, $val);
+    }
+    return @result;
+}
+
 =func Compile
 
 =cut
@@ -102,12 +103,13 @@ sub Compile : Exportable(simple) {
     push @Body => Meta(delete $struct->{host});
     push @Body => Intro(delete $struct->{name}, delete $struct->{description});
     foreach my $resource (@{ delete $struct->{resources} }) {
-        push @Body => Resource(%$resource);
+        push @Body => Resource($resource);
     }
     if (my $groups = delete $struct->{groups}) {
-        foreach my $group (sort keys %$groups) {
-            push @Body => Group($group, delete $groups->{$group});
-        }
+        _arrayhashloop($groups, sub {
+            my ($group, $args) = @_;
+            push @Body => Group($group, $args);
+        });
     }
     return _autoprint(wantarray, Concat(@Body));
 }
@@ -258,7 +260,7 @@ If C<$body> is an ArrayRef, every item which is a HashRef will be passed to L</R
 sub Group : Exportable(minimal) {
     my ($identifier, $body, $indent) = @_;
     if (ref $body eq 'ARRAY') {
-        $body = Concat(map { (ref($_) eq 'HASH') ? Resource(%$_) : $_ } @$body);
+        $body = Concat(map { Resource($_) } @$body);
     }
     return _autoprint(wantarray, _header(1, "Group $identifier", $body, $indent));
 }
@@ -309,17 +311,17 @@ With C<$uri>
 
 # Resource: Sesction Parameters Model Action
 sub Resource : Exportable(resource) {
-    my %args = @_;
-    my ($method, $uri, $identifier, $body, $indent, $level, $parameters, $model, $actions) = @args{qw{ method uri identifier body indent level parameters model actions }};
+    my $args = shift;
+    my ($method, $uri, $identifier, $body, $indent, $level, $parameters, $model, $actions) = @$args{qw{ method uri identifier body indent level parameters model actions }};
     $level //= 2;
     $body //= '';
     if (ref $body eq 'CODE') {
         $body = Section($body);
     } else {
         my @body;
-        push @body => Parameters(%$parameters) if ref $parameters eq 'HASH';
+        push @body => Parameters($parameters) if ref $parameters eq 'ARRAY';
         push @body => Model($model) if ref $model eq 'HASH';
-        push @body => map { Action(%$_) } @$actions if ref $actions eq 'ARRAY';
+        push @body => map { Action($_) } @$actions if ref $actions eq 'ARRAY';
         $body = Concat(@body);
     }
     if ($method and $uri) {
@@ -357,7 +359,7 @@ sub Model : Exportable(resource) {
         return _autoprint(wantarray, Model($type, $args));
     } else {
         my ($media_type, $payload, $indent) = @_;
-        $payload = Payload(%$payload) if ref $payload eq 'HASH';
+        $payload = Payload($payload) if ref $payload eq 'HASH';
         return _autoprint(wantarray, _listitem("Model ($media_type)", $payload, $indent));
     }
 }
@@ -388,26 +390,21 @@ sub Schema : Exportable(singles) {
 # Attributes:
 sub Attributes : Exportable(singles) {
     my ($typedef, $attrs, $indent) = @_;
-    if ($attrs) {
-        my @attrs;
-        foreach my $attr (sort keys %$attrs) {
-            my %def = %{ $attrs->{$attr} };
-            my $str = "$attr";
-            if (my $example = delete $def{example}) {
-                $str .= ": $example";
-            }
-            if (my $type = delete $def{type}) {
-                $str .= " ($type)";
-            }
-            if (my $desc = delete $def{description}) {
-                $str .= " - $desc";
-            }
-            push @attrs => $str;
+    my @attrs = _arrayhashloop($attrs, sub {
+        my ($attr, $def) = @_;
+        my $str = "$attr";
+        if (my $example = delete $def->{example}) {
+            $str .= ": $example";
         }
-        return _autoprint(wantarray, _listitem("Attributes ($typedef)", _list(@attrs), $indent));
-    } else {
-        return _autoprint(wantarray, _listitem("Attributes ($typedef)"));
-    }
+        if (my $type = delete $def->{type}) {
+            $str .= " ($type)";
+        }
+        if (my $desc = delete $def->{description}) {
+            $str .= " - $desc";
+        }
+        return $str;
+    });
+    return _autoprint(wantarray, _listitem("Attributes ($typedef)", _list(@attrs), $indent));
 }
 
 =func Action
@@ -462,10 +459,10 @@ With C<$method>:
 
 =cut
 
-# Action: Section Relation Parameters Reference Asset Request_Ref Request Response_Ref Response Concat
+# Action: Section Relation Parameters Reference Request_Ref Request Response_Ref Response Concat
 sub Action : Exportable() {
-    my %args = @_;
-    my ($method, $uri, $identifier, $body, $indent, $level, $relation, $parameters, $assets, $requests, $responses, $request, $response) = @args{qw{ method uri identifier body indent level relation parameters assets requests responses request response }};
+    my $args = shift;
+    my ($method, $uri, $identifier, $body, $indent, $level, $relation, $parameters, $requests, $responses) = @$args{qw{ method uri identifier body indent level relation parameters requests responses }};
     $level //= 3;
     $body //= '';
     if (ref $body eq 'CODE') {
@@ -473,31 +470,23 @@ sub Action : Exportable() {
     } else {
         my @body;
         push @body => Relation($relation) if defined $relation;
-        push @body => Parameters(%$parameters) if ref $parameters eq 'HASH';
-        if (ref $assets eq 'ARRAY') {
-            push @body => map { my @args = @$_; @args == 3 ? Reference(@args) : Asset(@args) } @$assets;
-        } else {
-            if (ref $requests eq 'ARRAY') {
-                push @body => map { my @args = @$_; @args == 2 ? Request_Ref(@args) : Request(@args) } @$requests;
-            } elsif (ref $request eq 'ARRAY') {
-                my @args = @$request;
-                if (@args == 2) {
-                    push @body => Request_Ref(@args);
-                } else {
-                    push @body => Request(@args);
-                }
+        push @body => Parameters($parameters) if ref $parameters eq 'ARRAY';
+        _arrayhashloop($requests, sub {
+            my ($identifier, $args) = @_;
+            if (ref $args) {
+                push @body => Request($identifier, $args);
+            } else {
+                push @body => Request_Ref($identifier, $args);
             }
-            if (ref $responses eq 'ARRAY') {
-                push @body => map { my @args = @$_; @args == 2 ? Response_Ref(@args) : Response(@args) } @$responses;
-            } elsif (ref $response eq 'ARRAY') {
-                my @args = @$response;
-                if (@args == 2) {
-                    push @body => Response_Ref(@args);
-                } else {
-                    push @body => Response(@args);
-                }
+        });
+        _arrayhashloop($responses, sub {
+            my ($identifier, $args) = @_;
+            if (ref $args) {
+                push @body => Response($identifier, $args);
+            } else {
+                push @body => Response_Ref($identifier, $args);
             }
-        }
+        });
         $body = Concat(@body) if @body;
     }
 
@@ -580,22 +569,22 @@ With C<$json>:
 
 # Payload: Headers Body Body_CODE Body_YAML Body_JSON Schema Concat
 sub Payload : Exportable() {
-    my %args = @_;
+    my $args = shift;
     my @body;
-    push @body => delete $args{description} if exists $args{description};
-    push @body => Headers(%{ delete $args{headers} }) if exists $args{headers};
+    push @body => $args->{description} if exists $args->{description};
+    push @body => Headers($args->{headers}) if exists $args->{headers};
 
-    if (exists $args{body}) {
-        push @body => Body(delete $args{body});
-    } elsif (exists $args{code}) {
-        push @body => Body_CODE(delete $args{code}, delete $args{lang});
-    } elsif (exists $args{yaml}) {
-        push @body => Body_YAML(delete $args{yaml});
-    } elsif (exists $args{json}) {
-        push @body => Body_JSON(delete $args{json});
+    if (exists $args->{body}) {
+        push @body => Body($args->{body});
+    } elsif (exists $args->{code}) {
+        push @body => Body_CODE($args->{code}, $args->{lang});
+    } elsif (exists $args->{yaml}) {
+        push @body => Body_YAML($args->{yaml});
+    } elsif (exists $args->{json}) {
+        push @body => Body_JSON($args->{json});
     }
 
-    push @body => Schema(delete $args{schema}) if exists $args{schema};
+    push @body => Schema($args->{schema}) if exists $args->{schema};
 
     return _autoprint(wantarray, Concat(@body));
 }
@@ -619,11 +608,11 @@ See L</Payload> for C<%payload>
 
 # Asset: Payload
 sub Asset : Exportable(singles) {
-    my ($keyword, $identifier, %payload) = @_;
+    my ($keyword, $identifier, $payload) = @_;
     my $str = "$keyword $identifier";
-    my $media_type = delete $payload{type};
+    my $media_type = $payload->{type};
     $str .= " ($media_type)" if defined $media_type;
-    return _autoprint(wantarray, _listitem($str, Payload(%payload)));
+    return _autoprint(wantarray, _listitem($str, Payload($payload)));
 }
 
 =func Reference
@@ -727,10 +716,10 @@ For every keypair, L</Parameter>(C<$name>, C<%$options>) will be called
 # Parameters: Parameter
 sub Parameters : Exportable() {
     my $body = '';
-    while (@_) {
-        my ($name, $opts) = (shift, shift);
-        $body .= Parameter($name, %$opts);
-    }
+    _arrayhashloop(shift, sub{
+        my ($name, $opts) = @_;
+        $body .= Parameter($name, $opts);
+    });
     return _autoprint(wantarray, _listitem('Parameters', $body));
 }
 
@@ -762,8 +751,8 @@ B<Invokation>: Parameter(
 
 # Parameter: Concat
 sub Parameter : Exportable(singles) {
-    my ($name, %opts) = @_;
-    my ($example_value, $required, $type, $enum, $shortdesc, $longdesc, $default, $members) = @opts{qw{ example required type enum shortdesc longdesc default members }};
+    my ($name, $opts) = @_;
+    my ($example_value, $required, $type, $enum, $shortdesc, $longdesc, $default, $members) = delete @$opts{qw{ example required type enum shortdesc longdesc default members }};
 
     my $constraint = $required ? 'required' : 'optional';
 
@@ -786,10 +775,10 @@ sub Parameter : Exportable(singles) {
 
     push @itembody => _listitem("Default: `$default`") if defined $default;
 
-    if (defined $members) {
-        $members = join "\n", map { "+ `$_` - ".$members->{$_} } sort keys %$members;
-        push @itembody => _listitem("Members", $members) if length $members;
-    }
+    my @members = _arrayhashloop($members, sub {
+        sprintf '+ `%s` - %s' => @_
+    });
+    push @itembody => _listitem("Members", join("\n" => @members)) if @members;
 
     my $itembody = Concat(@itembody);
 
@@ -815,13 +804,14 @@ B<Invokation>: Headers(
 # Headers:
 sub Headers : Exportable(singles) {
     my $body = '';
-    while (@_ and my ($name, $value) = (shift(@_), shift(@_))) {
+    _arrayhashloop(shift, sub {
+        my ($name, $value) = @_;
         $name = lc($name =~ s{([a-z])([A-Z])}{$1-$2}gr);
         $name =~ s{_}{-}g;
         $name =~ s{-+([^-]+)}{'-'.ucfirst($1)}eg;
         $name = ucfirst($name);
         $body .= "\n    $name: $value";
-    }
+    });
     $body =~ s{^\n+}{}s;
     return _autoprint(wantarray, _listitem('Headers', $body));
 }

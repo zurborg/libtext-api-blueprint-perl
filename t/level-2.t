@@ -9,22 +9,22 @@ plan tests => 4;
 
 ################################################################################
 
-tdt(Parameters(
+tdt(Parameters([
     foo => {
         (map {($_=>$_)} qw(example required type enum shortdesc longdesc default)),
-        members => {
+        members => [
             foo => 'foof',
             bar => 'barf',
-        }
+        ]
     },
     bar => {
         (map {($_=>$_)} qw(example required type enum shortdesc longdesc default)),
-        members => {
+        members => [
             foo => 'foof',
             bar => 'barf',
-        }
+        ]
     },
-), <<EOT, 'Parameters');
+]), <<EOT, 'Parameters');
 + Parameters
 
     + foo: `example` (enum[enum], required) - shortdesc
@@ -35,8 +35,8 @@ tdt(Parameters(
         
         + Members
         
-            + `bar` - barf
             + `foo` - foof
+            + `bar` - barf
     
     + bar: `example` (enum[enum], required) - shortdesc
     
@@ -46,8 +46,8 @@ tdt(Parameters(
         
         + Members
         
-            + `bar` - barf
             + `foo` - foof
+            + `bar` - barf
     
     
 
