@@ -92,6 +92,13 @@ sub _arrayhashloop {
     return @result;
 }
 
+sub _complain {
+    my ($name, $hash) = @_;
+    foreach my $key (keys %$hash) {
+        die "unsupported keyword in $name: $key\n";
+    }
+}
+
 =func Compile
 
 =cut
@@ -111,6 +118,7 @@ sub Compile : Exportable(simple) {
             push @Body => Group($group, $args);
         });
     }
+    _complain(Compile => $struct);
     return _autoprint(wantarray, Concat(@Body));
 }
 
@@ -312,7 +320,8 @@ With C<$uri>
 # Resource: Sesction Parameters Model Action
 sub Resource : Exportable(resource) {
     my $args = shift;
-    my ($method, $uri, $identifier, $body, $indent, $level, $parameters, $model, $actions) = @$args{qw{ method uri identifier body indent level parameters model actions }};
+    my ($method, $uri, $identifier, $body, $indent, $level, $parameters, $model, $actions) = delete @$args{qw{ method uri identifier body indent level parameters model actions }};
+    _complain(Resource => $args);
     $level //= 2;
     $body //= '';
     if (ref $body eq 'CODE') {
@@ -402,6 +411,7 @@ sub Attributes : Exportable(singles) {
         if (my $desc = delete $def->{description}) {
             $str .= " - $desc";
         }
+        _complain("Attributes($attr)" => $def);
         return $str;
     });
     return _autoprint(wantarray, _listitem("Attributes ($typedef)", _list(@attrs), $indent));
@@ -462,7 +472,8 @@ With C<$method>:
 # Action: Section Relation Parameters Reference Request_Ref Request Response_Ref Response Concat
 sub Action : Exportable() {
     my $args = shift;
-    my ($method, $uri, $identifier, $body, $indent, $level, $relation, $parameters, $requests, $responses) = @$args{qw{ method uri identifier body indent level relation parameters requests responses }};
+    my ($method, $uri, $identifier, $body, $indent, $level, $relation, $parameters, $requests, $responses) = delete @$args{qw{ method uri identifier body indent level relation parameters requests responses }};
+    _complain(Action => $args);
     $level //= 3;
     $body //= '';
     if (ref $body eq 'CODE') {
@@ -470,7 +481,7 @@ sub Action : Exportable() {
     } else {
         my @body;
         push @body => Relation($relation) if defined $relation;
-        push @body => Parameters($parameters) if ref $parameters eq 'ARRAY';
+        push @body => Parameters($parameters) if defined $parameters;
         _arrayhashloop($requests, sub {
             my ($identifier, $args) = @_;
             if (ref $args) {
@@ -571,21 +582,22 @@ With C<$json>:
 sub Payload : Exportable() {
     my $args = shift;
     my @body;
-    push @body => $args->{description} if exists $args->{description};
-    push @body => Headers($args->{headers}) if exists $args->{headers};
+    push @body => delete $args->{description} if exists $args->{description};
+    push @body => Headers(delete $args->{headers}) if exists $args->{headers};
 
     if (exists $args->{body}) {
-        push @body => Body($args->{body});
+        push @body => Body(delete $args->{body});
     } elsif (exists $args->{code}) {
-        push @body => Body_CODE($args->{code}, $args->{lang});
+        push @body => Body_CODE(delete $args->{code}, delete $args->{lang});
     } elsif (exists $args->{yaml}) {
-        push @body => Body_YAML($args->{yaml});
+        push @body => Body_YAML(delete $args->{yaml});
     } elsif (exists $args->{json}) {
-        push @body => Body_JSON($args->{json});
+        push @body => Body_JSON(delete $args->{json});
     }
 
-    push @body => Schema($args->{schema}) if exists $args->{schema};
+    push @body => Schema(delete $args->{schema}) if exists $args->{schema};
 
+    _complain(Payload => $args);
     return _autoprint(wantarray, Concat(@body));
 }
 
@@ -610,7 +622,7 @@ See L</Payload> for C<%payload>
 sub Asset : Exportable(singles) {
     my ($keyword, $identifier, $payload) = @_;
     my $str = "$keyword $identifier";
-    my $media_type = $payload->{type};
+    my $media_type = delete $payload->{type};
     $str .= " ($media_type)" if defined $media_type;
     return _autoprint(wantarray, _listitem($str, Payload($payload)));
 }
@@ -753,6 +765,7 @@ B<Invokation>: Parameter(
 sub Parameter : Exportable(singles) {
     my ($name, $opts) = @_;
     my ($example_value, $required, $type, $enum, $shortdesc, $longdesc, $default, $members) = delete @$opts{qw{ example required type enum shortdesc longdesc default members }};
+    _complain(Parameter => $opts);
 
     my $constraint = $required ? 'required' : 'optional';
 
