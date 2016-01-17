@@ -43,11 +43,11 @@ Increments header offset by `$offset` for everything executed in `$coderef`.
 )
 
     $block[0]
-    
+
     $block[1]
-    
+
     $block[2]
-    
+
     ...
 
 ## Text
@@ -84,7 +84,7 @@ Increments header offset by `$offset` for everything executed in `$coderef`.
 If `$body` is an ArrayRef, every item which is a HashRef will be passed to ["Resource"](#resource).
 
     # Group $identifier
-    
+
     $body
 
 ## Resource
@@ -108,19 +108,19 @@ If `$body` is an ArrayRef, every item which is a HashRef will be passed to ["Res
 With `$method` and `$uri`
 
     ## $method $uri
-    
+
     $body
 
 With `$identifier` and `$uri`
 
     ## $identifier [$uri]
-    
+
     $body
 
 With `$uri`
 
     ## $uri
-    
+
     $body
 
 ## Model
@@ -134,7 +134,7 @@ With `$uri`
 See ["Payload"](#payload) if `$payload` is a HashRef.
 
     + Model ($media_type)
-    
+
     $payload
 
 ## Schema
@@ -145,7 +145,7 @@ See ["Payload"](#payload) if `$payload` is a HashRef.
 )
 
     + Schema
-    
+
     $body
 
 ## Action
@@ -175,19 +175,19 @@ See ["Payload"](#payload) if `$payload` is a HashRef.
 With `$identifier` `$method` and `$uri`:
 
     ### $identifier [$method $uri]
-    
+
     $body
 
 With `$identifier` and `$method`:
 
     ### $identifier [$method]
-    
+
     $body
 
 With `$method`:
 
     ### $method
-    
+
     $body
 
 ## Payload
@@ -211,22 +211,22 @@ With `$method`:
 Complete output:
 
     $description
-    
+
     + Headers
             $key: $value
-    
+
     + Body
-    
+
     $body
-    
+
     + Schema
-    
+
     $schema
 
 With `$code` and `$lang`:
 
     + Body
-    
+
         ```$lang
         $code
         ```
@@ -234,7 +234,7 @@ With `$code` and `$lang`:
 With `$yaml`:
 
     + Body
-    
+
         ```yaml
         $yaml
         ```
@@ -259,7 +259,7 @@ With `$json`:
 See ["Payload"](#payload) for `%payload`
 
     # $keyword $identifier ($type)
-    
+
     $payload
 
 ## Reference
@@ -271,7 +271,7 @@ See ["Payload"](#payload) for `%payload`
 )
 
     # $keyword $identifier
-    
+
         [$reference][]
 
 ## Request
@@ -334,11 +334,11 @@ For every keypair, ["Parameter"](#parameter)(`$name`, `%$options`) will be calle
 )
 
     + $name: `$example` ($type, $required_or_optional) - $shortdesc
-    
+
         $longdesc
-        
+
         + Default: `$default`
-        
+
         + Members
             + `$key` - $value
             + ...
@@ -364,7 +364,7 @@ For every keypair, ["Parameter"](#parameter)(`$name`, `%$options`) will be calle
 )
 
     + Body
-    
+
             $body
 
 ## Body\_CODE
@@ -375,7 +375,7 @@ For every keypair, ["Parameter"](#parameter)(`$name`, `%$options`) will be calle
 )
 
     + Body
-    
+
         ```$lang
         $code
         ```
@@ -387,7 +387,7 @@ For every keypair, ["Parameter"](#parameter)(`$name`, `%$options`) will be calle
 )
 
     + Body
-    
+
         ```yaml
         $struct
         ```
@@ -399,7 +399,7 @@ For every keypair, ["Parameter"](#parameter)(`$name`, `%$options`) will be calle
 )
 
     + Body
-    
+
         ```json
         $struct
         ```
