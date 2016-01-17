@@ -328,9 +328,9 @@ sub Resource : Exportable(resource) {
         $body = Section($body);
     } else {
         my @body;
-        push @body => Parameters($parameters) if ref $parameters eq 'ARRAY';
-        push @body => Model($model) if ref $model eq 'HASH';
-        push @body => map { Action($_) } @$actions if ref $actions eq 'ARRAY';
+        push @body => Parameters($parameters) if defined $parameters;
+        push @body => Model($model) if defined $model;
+        push @body => map { Action($_) } @$actions if defined $actions;
         $body = Concat(@body);
     }
     if ($method and $uri) {
@@ -368,7 +368,7 @@ sub Model : Exportable(resource) {
         return _autoprint(wantarray, Model($type, $args));
     } else {
         my ($media_type, $payload, $indent) = @_;
-        $payload = Payload($payload) if ref $payload eq 'HASH';
+        $payload = Payload($payload) if ref $payload;
         return _autoprint(wantarray, _listitem("Model ($media_type)", $payload, $indent));
     }
 }
