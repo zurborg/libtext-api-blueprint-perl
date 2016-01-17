@@ -244,7 +244,11 @@ sub Code : Exportable(singles) {
     $code = _flatten($code);
     $lang //= '';
     $delimiters //= 3;
-    my $delimiter = '`' x $delimiters;
+    my $delimiter;
+    do {
+        $delimiter = '`' x $delimiters;
+        $delimiters++;
+    } until $code !~ m{\Q$delimiter\E};
     return _autoprint(wantarray, "$delimiter$lang\n$code\n$delimiter\n\n");
 }
 
