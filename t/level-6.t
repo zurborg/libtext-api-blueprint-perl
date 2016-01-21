@@ -5,7 +5,7 @@ use Text::API::Blueprint qw(Action);
 
 use constant EOL => "\n";
 
-plan tests => 10;
+plan tests => 12;
 
 ################################################################################
 
@@ -207,6 +207,134 @@ tdt(Action({
 
     + a: b (c) - d
     + e: f (g) - h
+
+EOT
+
+################################################################################
+
+tdt(Action({
+    requests => [
+        identifier => {
+            type => 'type',
+            description => 'description',
+            headers => [ foo => 'bar' ],
+            code => 'code',
+            lang => 'lang',
+            schema => "schema",
+        }
+    ],
+    responses => [
+        identifier => {
+            type => 'type',
+            description => 'description',
+            headers => [ foo => 'bar' ],
+            code => 'code',
+            lang => 'lang',
+            schema => "schema",
+        },
+    ],
+    map {$_=>$_} qw(method)
+}), <<'EOT', 'Action response(single)');
+### method
+
++ Request identifier (type)
+
+    description
+    
+    + Headers
+    
+            Foo: bar
+    
+    + Body
+    
+        ```lang
+        code
+        ```
+    
+    + Schema
+    
+        schema
+
++ Response identifier (type)
+
+    description
+    
+    + Headers
+    
+            Foo: bar
+    
+    + Body
+    
+        ```lang
+        code
+        ```
+    
+    + Schema
+    
+        schema
+
+EOT
+
+################################################################################
+
+tdt(Action({
+    assets => [
+        'Request identifier' => {
+            type => 'type',
+            description => 'description',
+            headers => [ foo => 'bar' ],
+            code => 'code',
+            lang => 'lang',
+            schema => "schema",
+        },
+        'Response identifier' => {
+            type => 'type',
+            description => 'description',
+            headers => [ foo => 'bar' ],
+            code => 'code',
+            lang => 'lang',
+            schema => "schema",
+        },
+    ],
+    map {$_=>$_} qw(method)
+}), <<'EOT', 'Action response(single)');
+### method
+
++ Request identifier (type)
+
+    description
+    
+    + Headers
+    
+            Foo: bar
+    
+    + Body
+    
+        ```lang
+        code
+        ```
+    
+    + Schema
+    
+        schema
+
++ Response identifier (type)
+
+    description
+    
+    + Headers
+    
+            Foo: bar
+    
+    + Body
+    
+        ```lang
+        code
+        ```
+    
+    + Schema
+    
+        schema
 
 EOT
 

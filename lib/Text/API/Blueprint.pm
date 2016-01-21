@@ -480,10 +480,10 @@ With C<$method>:
 
 =cut
 
-# Action: Section Relation Parameters Attributes Request_Ref Request Response_Ref Response Concat
+# Action: Section Relation Parameters Attributes Asset Reference Request_Ref Request Response_Ref Response Concat
 sub Action : Exportable() {
     my $args = shift;
-    my ($method, $uri, $identifier, $body, $indent, $level, $relation, $parameters, $attributes, $requests, $responses) = delete @$args{qw{ method uri identifier body indent level relation parameters attributes requests responses }};
+    my ($method, $uri, $identifier, $body, $indent, $level, $relation, $parameters, $attributes, $assets, $requests, $responses) = delete @$args{qw{ method uri identifier body indent level relation parameters attributes assets requests responses }};
     _complain(Action => $args);
     $level //= 3;
     $body //= '';
@@ -494,22 +494,34 @@ sub Action : Exportable() {
         push @body => Relation($relation) if defined $relation;
         push @body => Parameters($parameters) if defined $parameters;
         push @body => Attributes($attributes) if defined $attributes;
-        _arrayhashloop($requests, sub {
-            my ($identifier, $args) = @_;
-            if (ref $args) {
-                push @body => Request($identifier, $args);
-            } else {
-                push @body => Request_Ref($identifier, $args);
-            }
-        });
-        _arrayhashloop($responses, sub {
-            my ($identifier, $args) = @_;
-            if (ref $args) {
-                push @body => Response($identifier, $args);
-            } else {
-                push @body => Response_Ref($identifier, $args);
-            }
-        });
+        if ($assets) {
+            _arrayhashloop($assets, sub {
+                my ($identifier, $args) = @_;
+                my @keyword_id = split(m{\s+}, $identifier, 2);
+                if (ref $args) {
+                    push @body => Asset(@keyword_id, $args);
+                } else {
+                    push @body => Reference(@keyword_id, $args);
+                }
+            });
+        } else {
+            _arrayhashloop($requests, sub {
+                my ($identifier, $args) = @_;
+                if (ref $args) {
+                    push @body => Request($identifier, $args);
+                } else {
+                    push @body => Request_Ref($identifier, $args);
+                }
+            });
+            _arrayhashloop($responses, sub {
+                my ($identifier, $args) = @_;
+                if (ref $args) {
+                    push @body => Response($identifier, $args);
+                } else {
+                    push @body => Response_Ref($identifier, $args);
+                }
+            });
+        }
         $body = Concat(@body) if @body;
     }
 
