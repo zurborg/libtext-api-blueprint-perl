@@ -5,7 +5,7 @@ use Text::API::Blueprint qw(Resource);
 
 use constant EOL => "\n";
 
-plan tests => 6;
+plan tests => 7;
 
 ################################################################################
 
@@ -113,6 +113,32 @@ tdt(Resource({
 ### foo
 
 ### bar
+
+EOT
+
+################################################################################
+
+tdt(Resource({
+    attributes => [
+        a => {
+            example => 'b',
+            type => 'c',
+            description => 'd'
+        },
+        e => {
+            example => 'f',
+            type => 'g',
+            description => 'h'
+        },
+    ],
+    map {$_=>$_} qw(uri)
+}), <<'EOT', 'Request attributes');
+## uri
+
++ Attributes
+
+    + a: b (c) - d
+    + e: f (g) - h
 
 EOT
 

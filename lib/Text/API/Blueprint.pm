@@ -323,10 +323,10 @@ With C<$uri>
 
 =cut
 
-# Resource: Sesction Parameters Model Action
+# Resource: Sesction Parameters Model Attributes Action
 sub Resource : Exportable(resource) {
     my $args = shift;
-    my ($method, $uri, $identifier, $body, $indent, $level, $parameters, $model, $actions) = delete @$args{qw{ method uri identifier body indent level parameters model actions }};
+    my ($method, $uri, $identifier, $body, $indent, $level, $parameters, $attributes, $model, $actions) = delete @$args{qw{ method uri identifier body indent level parameters attributes model actions }};
     _complain(Resource => $args);
     $level //= 2;
     $body //= '';
@@ -335,6 +335,7 @@ sub Resource : Exportable(resource) {
     } else {
         my @body;
         push @body => Parameters($parameters) if defined $parameters;
+        push @body => Attributes($attributes) if defined $attributes;
         push @body => Model($model) if defined $model;
         push @body => map { Action($_) } @$actions if defined $actions;
         $body = Concat(@body);
@@ -404,23 +405,27 @@ sub Schema : Exportable(singles) {
 
 # Attributes:
 sub Attributes : Exportable(singles) {
-    my ($typedef, $attrs, $indent) = @_;
-    my @attrs = _arrayhashloop($attrs, sub {
-        my ($attr, $def) = @_;
-        my $str = "$attr";
-        if (my $example = delete $def->{example}) {
-            $str .= ": $example";
-        }
-        if (my $type = delete $def->{type}) {
-            $str .= " ($type)";
-        }
-        if (my $desc = delete $def->{description}) {
-            $str .= " - $desc";
-        }
-        _complain("Attributes($attr)" => $def);
-        return $str;
-    });
-    return _autoprint(wantarray, _listitem("Attributes ($typedef)", _list(@attrs), $indent));
+    my ($attrs, $indent) = @_;
+    if (ref $attrs) {
+        my @attrs = _arrayhashloop($attrs, sub {
+            my ($attr, $def) = @_;
+            my $str = "$attr";
+            if (my $example = delete $def->{example}) {
+                $str .= ": $example";
+            }
+            if (my $type = delete $def->{type}) {
+                $str .= " ($type)";
+            }
+            if (my $desc = delete $def->{description}) {
+                $str .= " - $desc";
+            }
+            _complain("Attributes($attr)" => $def);
+            return $str;
+        });
+        return _autoprint(wantarray, _listitem("Attributes", _list(@attrs), $indent));
+    } else {
+        return _autoprint(wantarray, _listitem("Attributes ($attrs)", _list(), $indent));
+    }
 }
 
 =func Action
@@ -475,10 +480,10 @@ With C<$method>:
 
 =cut
 
-# Action: Section Relation Parameters Reference Request_Ref Request Response_Ref Response Concat
+# Action: Section Relation Parameters Attributes Request_Ref Request Response_Ref Response Concat
 sub Action : Exportable() {
     my $args = shift;
-    my ($method, $uri, $identifier, $body, $indent, $level, $relation, $parameters, $requests, $responses) = delete @$args{qw{ method uri identifier body indent level relation parameters requests responses }};
+    my ($method, $uri, $identifier, $body, $indent, $level, $relation, $parameters, $attributes, $requests, $responses) = delete @$args{qw{ method uri identifier body indent level relation parameters attributes requests responses }};
     _complain(Action => $args);
     $level //= 3;
     $body //= '';
@@ -488,6 +493,7 @@ sub Action : Exportable() {
         my @body;
         push @body => Relation($relation) if defined $relation;
         push @body => Parameters($parameters) if defined $parameters;
+        push @body => Attributes($attributes) if defined $attributes;
         _arrayhashloop($requests, sub {
             my ($identifier, $args) = @_;
             if (ref $args) {
@@ -584,12 +590,13 @@ With C<$json>:
 
 =cut
 
-# Payload: Headers Body Body_CODE Body_YAML Body_JSON Schema Concat
+# Payload: Headers Attributes Body Body_CODE Body_YAML Body_JSON Schema Concat
 sub Payload : Exportable() {
     my $args = shift;
     my @body;
     push @body => delete $args->{description} if exists $args->{description};
     push @body => Headers(delete $args->{headers}) if exists $args->{headers};
+    push @body => Attributes(delete $args->{attributes}) if exists $args->{attributes};
 
     if (exists $args->{body}) {
         push @body => Body(delete $args->{body});

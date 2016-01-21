@@ -67,7 +67,7 @@ EOT
 
 ################################################################################
 
-tdt(Attributes('foo', [
+tdt(Attributes([
     a => {
         example => 'b',
         type => 'c',
@@ -79,7 +79,7 @@ tdt(Attributes('foo', [
         description => 'h'
     },
 ], 3) => <<EOT, 'Attributes (2)');
-+ Attributes (foo)
++ Attributes
 
    + a: b (c) - d
    + e: f (g) - h

@@ -5,7 +5,7 @@ use Text::API::Blueprint qw(Action);
 
 use constant EOL => "\n";
 
-plan tests => 9;
+plan tests => 10;
 
 ################################################################################
 
@@ -181,6 +181,32 @@ tdt(Action({
 + Response foo2
 
     [bar2][]
+
+EOT
+
+################################################################################
+
+tdt(Action({
+    attributes => [
+        a => {
+            example => 'b',
+            type => 'c',
+            description => 'd'
+        },
+        e => {
+            example => 'f',
+            type => 'g',
+            description => 'h'
+        },
+    ],
+    map {$_=>$_} qw(method)
+}), <<'EOT', 'Action responses');
+### method
+
++ Attributes
+
+    + a: b (c) - d
+    + e: f (g) - h
 
 EOT
 
