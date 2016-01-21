@@ -2,7 +2,7 @@ use strictures 2;
 
 package Text::API::Blueprint;
 
-# ABSTRACT: ...
+# ABSTRACT: Markdown generator for API blueprint format
 
 use Class::Load qw(load_class);
 use Exception::Delayed;
