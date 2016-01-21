@@ -109,8 +109,10 @@ sub Compile : Exportable(simple) {
     my @Body;
     push @Body => Meta(delete $struct->{host});
     push @Body => Intro(delete $struct->{name}, delete $struct->{description});
-    foreach my $resource (@{ delete $struct->{resources} }) {
-        push @Body => Resource($resource);
+    if (my $resources = delete $struct->{resources}) {
+        foreach my $resource (@$resources) {
+            push @Body => Resource($resource);
+        }
     }
     if (my $groups = delete $struct->{groups}) {
         _arrayhashloop($groups, sub {
