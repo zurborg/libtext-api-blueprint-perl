@@ -12,8 +12,9 @@ plan tests => 1;
 tdt(Compile({
     host => 'host',
     name => 'name',
-    description => 'description',
+    description => 'description1',
     resources => [{
+        description => 'description2',
         uri => 'uri'
     }],
     groups => [
@@ -25,9 +26,11 @@ HOST: host
 
 # name
 
-description
+description1
 
 ## uri
+
+description2
 
 # Group foo
 

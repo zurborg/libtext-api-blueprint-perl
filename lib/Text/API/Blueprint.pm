@@ -326,7 +326,7 @@ With C<$uri>
 # Resource: Sesction Parameters Model Attributes Action
 sub Resource : Exportable(resource) {
     my $args = shift;
-    my ($method, $uri, $identifier, $body, $indent, $level, $parameters, $attributes, $model, $actions) = delete @$args{qw{ method uri identifier body indent level parameters attributes model actions }};
+    my ($method, $uri, $identifier, $body, $indent, $level, $description, $parameters, $attributes, $model, $actions) = delete @$args{qw{ method uri identifier body indent level description parameters attributes model actions }};
     _complain(Resource => $args);
     $level //= 2;
     $body //= '';
@@ -334,6 +334,7 @@ sub Resource : Exportable(resource) {
         $body = Section($body);
     } else {
         my @body;
+        push @body => $description if defined $description;
         push @body => Parameters($parameters) if defined $parameters;
         push @body => Attributes($attributes) if defined $attributes;
         push @body => Model($model) if defined $model;
@@ -483,7 +484,7 @@ With C<$method>:
 # Action: Section Relation Parameters Attributes Asset Reference Request_Ref Request Response_Ref Response Concat
 sub Action : Exportable() {
     my $args = shift;
-    my ($method, $uri, $identifier, $body, $indent, $level, $relation, $parameters, $attributes, $assets, $requests, $responses) = delete @$args{qw{ method uri identifier body indent level relation parameters attributes assets requests responses }};
+    my ($method, $uri, $identifier, $body, $indent, $level, $description, $relation, $parameters, $attributes, $assets, $requests, $responses) = delete @$args{qw{ method uri identifier body indent level description relation parameters attributes assets requests responses }};
     _complain(Action => $args);
     $level //= 3;
     $body //= '';
@@ -491,6 +492,7 @@ sub Action : Exportable() {
         $body = Section($body);
     } else {
         my @body;
+        push @body => $description if defined $description;
         push @body => Relation($relation) if defined $relation;
         push @body => Parameters($parameters) if defined $parameters;
         push @body => Attributes($attributes) if defined $attributes;
