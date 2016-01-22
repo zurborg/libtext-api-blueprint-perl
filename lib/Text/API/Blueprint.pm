@@ -921,11 +921,16 @@ B<Invokation>: Body_YAML(
 
 =cut
 
+sub _yaml {
+    my ($struct) = @_;
+    load_class('YAML::Any');
+    YAML::Any::Dump($struct);
+}
+
 # Body_YAML: Body_CODE
 sub Body_YAML : Exportable() {
     my ($struct) = @_;
-    load_class('YAML::Any');
-    return _autoprint(wantarray, Body_CODE(YAML::Any::Dump($struct), 'yaml'));
+    return _autoprint(wantarray, Body_CODE(_yaml($struct), 'yaml'));
 }
 
 =func Body_JSON
@@ -942,12 +947,17 @@ B<Invokation>: Body_JSON(
 
 =cut
 
-# Body_JSON: Body_CODE
-sub Body_JSON : Exportable() {
+sub _json {
     my ($struct) = @_;
     load_class('JSON');
     our $JSON //= JSON->new->utf8->pretty->allow_nonref->convert_blessed;
-    return _autoprint(wantarray, Body_CODE($JSON->encode($struct), 'json'));
+    $JSON->encode($struct);
+}
+
+# Body_JSON: Body_CODE
+sub Body_JSON : Exportable() {
+    my ($struct) = @_;
+    return _autoprint(wantarray, Body_CODE(_json($struct), 'json'));
 }
 
 =func Relation
