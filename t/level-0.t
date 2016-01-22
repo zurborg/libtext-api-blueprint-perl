@@ -78,11 +78,29 @@ tdt(Attributes([
         type => 'g',
         description => 'h'
     },
+    i => [
+        j => {
+            example => 'k',
+            type => 'l',
+            description => 'm',
+        },
+        n => [
+            o => {
+                example => 'p',
+                type => 'q',
+                description => 'r',
+            }
+        ]
+    ]
 ], 3) => <<EOT, 'Attributes (2)');
 + Attributes
 
-   + a: b (c) - d
-   + e: f (g) - h
+   + a: `b` (c) - d
+   + e: `f` (g) - h
+   + i
+       + j: `k` (l) - m
+       + n
+           + o: `p` (q) - r
 
 EOT
 

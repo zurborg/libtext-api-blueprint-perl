@@ -404,24 +404,36 @@ sub Schema : Exportable(singles) {
 
 =cut
 
+sub Attribute ;
+sub Attribute : Exportable(singles) {
+    my ($attr, $def) = @_;
+    my $str = "$attr";
+    if (ref $def eq 'HASH') {
+        if (my $example = delete $def->{example}) {
+            $str .= ": `$example`";
+        }
+        if (my $type = delete $def->{type}) {
+            $str .= " ($type)";
+        }
+        if (my $desc = delete $def->{description}) {
+            $str .= " - $desc";
+        }
+        _complain("Attributes($attr)" => $def);
+    } else {
+        my @strs = _arrayhashloop($def, sub {
+            return Attribute(@_);
+        });
+        $str .= "\n"._indent(_list(@strs));
+    }
+    return $str;
+}
+
 # Attributes:
 sub Attributes : Exportable(singles) {
     my ($attrs, $indent) = @_;
     if (ref $attrs) {
         my @attrs = _arrayhashloop($attrs, sub {
-            my ($attr, $def) = @_;
-            my $str = "$attr";
-            if (my $example = delete $def->{example}) {
-                $str .= ": $example";
-            }
-            if (my $type = delete $def->{type}) {
-                $str .= " ($type)";
-            }
-            if (my $desc = delete $def->{description}) {
-                $str .= " - $desc";
-            }
-            _complain("Attributes($attr)" => $def);
-            return $str;
+            return Attribute(@_);
         });
         return _autoprint(wantarray, _listitem("Attributes", _list(@attrs), $indent));
     } else {
