@@ -409,6 +409,9 @@ sub Attribute : Exportable(singles) {
     my ($attr, $def) = @_;
     my $str = "$attr";
     if (ref $def eq 'HASH') {
+        if (my $enum = delete $def->{enum}) {
+            $def->{type} = 'enum['.$enum.']';
+        }
         if (my $example = delete $def->{example}) {
             $str .= ": `$example`";
         }
@@ -417,6 +420,9 @@ sub Attribute : Exportable(singles) {
         }
         if (my $desc = delete $def->{description}) {
             $str .= " - $desc";
+        }
+        if (my $members = delete $def->{members}) {
+            $str .= "\n"._indent(_list(map { "`$_`" } @$members));
         }
         _complain("Attributes($attr)" => $def);
     } else {
