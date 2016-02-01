@@ -903,8 +903,7 @@ B<Invokation>: Body_CODE(
 
 # Body_CODE: Code
 sub Body_CODE : Exportable() {
-    my ($code, $lang) = @_;
-    return _autoprint(wantarray, _listitem('Body', Code(_flatten($code), $lang)));
+    return _autoprint(wantarray, _listitem('Body', Code(@_)));
 }
 
 =func Body_YAML
