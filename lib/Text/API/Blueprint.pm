@@ -163,9 +163,10 @@ B<Invokation>: Meta(
 
 # Meta:
 sub Meta : Exportable(singles) {
-    my $host = shift;
     my $str = "FORMAT: 1A8\n";
-    $str .= "HOST: $host\n" if defined $host;
+    if (my $host = shift) {
+        $str .= "HOST: $host\n";
+    }
     return _autoprint(wantarray, "$str\n");
 }
 
@@ -184,7 +185,7 @@ B<Invokation>: Intro(
 # Intro:
 sub Intro : Exportable(singles) {
     my ($name, $description) = @_;
-    return _autoprint(wantarray, _header(1, $name, $description));
+    return _autoprint(wantarray, _header(1, $name, $description // ''));
 }
 
 =func Concat
@@ -242,10 +243,10 @@ B<Invokation>: Code(
 
 # Code:
 sub Code : Exportable(singles) {
-    my ($code, $lang, $delimiters) = @_;
+    my ($code, $lang) = @_;
     $code = _flatten($code);
     $lang //= '';
-    $delimiters //= 3;
+    my $delimiters = 3;
     my $delimiter;
     do {
         $delimiter = '`' x $delimiters;
@@ -425,11 +426,13 @@ sub Attribute : Exportable(singles) {
             $str .= "\n"._indent(_list(map { "`$_`" } @$members));
         }
         _complain("Attributes($attr)" => $def);
-    } else {
+    } elsif (ref $def eq 'ARRAY') {
         my @strs = _arrayhashloop($def, sub {
             return Attribute(@_);
         });
         $str .= "\n"._indent(_list(@strs));
+    } else {
+        croak("second argument is not a HashRef nor an ArrayRef");
     }
     return $str;
 }
@@ -667,8 +670,9 @@ See L</Payload> for C<%payload>
 sub Asset : Exportable(singles) {
     my ($keyword, $identifier, $payload) = @_;
     my $str = "$keyword $identifier";
-    my $media_type = delete $payload->{type};
-    $str .= " ($media_type)" if defined $media_type;
+    if (my $media_type = delete $payload->{type}) {
+        $str .= " ($media_type)";
+    }
     return _autoprint(wantarray, _listitem($str, Payload($payload)));
 }
 
@@ -864,6 +868,7 @@ sub Headers : Exportable(singles) {
     my $body = '';
     _arrayhashloop(shift, sub {
         my ($name, $value) = @_;
+        $name =~ s{^-(.)}{'x'.uc($1)}e;
         $name = lc($name =~ s{([a-z])([A-Z])}{$1-$2}gr);
         $name =~ s{_}{-}g;
         $name =~ s{-+([^-]+)}{'-'.ucfirst($1)}eg;

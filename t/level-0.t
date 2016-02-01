@@ -33,12 +33,7 @@ EOT
 
 ################################################################################
 
-tdt(Code('foo', 'bar', 5) => <<EOT, 'Code');
-`````bar
-foo
-`````
-
-EOT
+pass('self-defined amount of delimiters is now deprecated');
 
 ################################################################################
 
@@ -117,7 +112,7 @@ EOT
 
 tdt(Headers([
     'foo' => 1,
-    'x-foo' => 2,
+    '-foo' => 2,
     'FooBarBaz' => 3,
 ]) => <<EOT, 'Headers');
 + Headers
