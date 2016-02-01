@@ -101,6 +101,29 @@ sub _complain {
 
 =func Compile
 
+    Compile({
+        # Meta
+        host => 'hostname',
+        # Intro
+        name => 'title',
+        description => 'short introduction',
+        resources => [
+            # Resource
+            {
+                ...
+            }
+        ],
+        groups => [
+            # Group
+            name => [
+                # Resource
+                {
+                    ...
+                }
+            ]
+        ],
+    });
+
 =cut
 
 # Compile: Meta Intro Resource Group Concat
@@ -126,10 +149,11 @@ sub Compile : Exportable(simple) {
 
 =func Section
 
-B<Invokation>: Section(
-    CodeRef C<$coderef>,
-    [ Int C<$offset> = C<1> ]
-)
+    Section(sub {
+        ...
+    })
+
+B<Invokation>: Section( CodeRef C<$coderef>, [ Int C<$offset> = C<1> ])
 
 Increments header offset by C<$offset> for everything executed in C<$coderef>.
 
@@ -152,9 +176,10 @@ sub Section : Exportable(singles) {
 
 =func Meta
 
-B<Invokation>: Meta(
-    [ Str C<$host> ]
-)
+    Meta();
+    Meta('localhost');
+
+B<Invokation>: Meta([ Str C<$host> ])
 
     FORMAT: 1A8
     HOST: $host
@@ -172,10 +197,10 @@ sub Meta : Exportable(singles) {
 
 =func Intro
 
-B<Invokation>: Intro(
-    Str C<$name>,
-    Str C<$description>
-)
+    Intro('Our API');
+    Intro('Our API', 'With a short introduction');
+
+B<Invokation>: Intro(Str C<$name>, [ Str C<$description> ])
 
     # $name
     $description
@@ -190,9 +215,9 @@ sub Intro : Exportable(singles) {
 
 =func Concat
 
-B<Invokation>: Concat(
-    Str C<@blocks>
-)
+    Concat('foo', 'bar');
+
+B<Invokation>: Concat( Str C<@blocks> )
 
     $block[0]
 
@@ -211,9 +236,9 @@ sub Concat : Exportable(singles) {
 
 =func Text
 
-B<Invokation>: Text(
-    Str C<@strings>
-)
+    Text('foo', 'bar');
+
+B<Invokation>: Text( Str C<@strings> )
 
     $string[0]
     $string[1]
@@ -229,11 +254,10 @@ sub Text : Exportable(helpers) {
 
 =func Code
 
-B<Invokation>: Code(
-    Str C<$code>,
-    [ Str C<$lang> = C<''> ],
-    [ Int C<$delimiters> = C<3> ]
-)
+    Code('foobar');
+    Code('{"foo":"bar"}', 'json');
+
+B<Invokation>: Code(Str C<$code>, [ Str C<$lang> = C<''> ])
 
     ```$lang
     $code
@@ -257,11 +281,15 @@ sub Code : Exportable(singles) {
 
 =func Group
 
-B<Invokation>: Group(
-    Str C<$identifier>,
-    Str|ArrayRef[HashRef|Str] C<$body>,
-    [ Int C<$indent> ]
-)
+    Group('header', 'body');
+    Group('name', [
+        # Resource
+        {
+            ...
+        }
+    ]);
+
+B<Invokation>: Group(Str C<$identifier>, Str|ArrayRef[HashRef|Str] C<$body>)
 
 If C<$body> is an ArrayRef, every item which is a HashRef will be passed to L</Resource>.
 
@@ -282,45 +310,65 @@ sub Group : Exportable(minimal) {
 
 =func Resource
 
-B<Invokation>: Resource(
-    Str C<:$method>,
-    Str C<:$uri>,
-    Str C<:$identifier>,
-    Str|CodeRef C<:$body>,
-    Int C<:$indent>,
-    Int C<:$level>,
-    HashRef C<:$parameters>,
-    HashRef C<:$model>,
-    ArrayRef C<:$actions>
-)
+    Resource({
+        ...
+    });
+
+B<Invokation>: Resource(HashRef $args)
+
+Allowed keywords for C<$args>:
 
 =over 4
 
-=item * See L</Parameters> for C<$parameters>
+=item * I<method>, I<uri>, I<identifier>
 
-=item * See L</Model> for C<$model>
-
-=item * See L</Action> for C<$actions>
-
-=back
-
-With C<$method> and C<$uri>
+With I<method> and I<uri>
 
     ## $method $uri
 
     $body
 
-With C<$identifier> and C<$uri>
+With I<identifier> and I<$uri>
 
     ## $identifier [$uri]
 
     $body
 
-With C<$uri>
+With I<uri>
 
     ## $uri
 
     $body
+
+Other combinations are invalid.
+
+=item * body
+
+If I<body> isa CodeRef, see L</Section>. I<description>, I<parameters>, I<attributes>, I<model>, I<actions> are not allowed then.
+
+=item * description
+
+A short introduction as a single string.
+
+=item * parameters
+
+See L</Parameters>.
+
+=item * attributes
+
+See L</Attributes>.
+
+=item * model
+
+See L</Model>.
+
+=item * actions
+
+Isa ArrayRef.
+
+See L</Action>.
+
+=back
 
 =cut
 
@@ -355,13 +403,16 @@ sub Resource : Exportable(resource) {
 
 =func Model
 
-B<Invokation>: Model(
-    Str C<$media_type>,
-    Str|HashRef C<$payload>,
-    [ Int C<$indent> ]
-)
+    Model({
+        type => 'mime/type',
+        # Payload
+        ...
+    });
+    Model('mime/type', 'payload');
 
-See L</Payload> if C<$payload> is a HashRef.
+B<Invokation>: Model(Str C<$media_type>, Str|HashRef C<$payload>, [ Int C<$indent> ]);
+
+See L</Payload> if the first and only argument is a HashRef.
 
     + Model ($media_type)
 
@@ -384,10 +435,9 @@ sub Model : Exportable(resource) {
 
 =func Schema
 
-B<Invokation>: Schema(
-    Str C<$body>,
-    [ Int C<$indent> ]
-)
+    Schema('body');
+
+B<Invokation>: Schema(Str C<$body>, [ Int C<$indent> ])
 
     + Schema
 
@@ -401,7 +451,28 @@ sub Schema : Exportable(singles) {
     return _autoprint(wantarray, _listitem("Schema", $body, $indent));
 }
 
-=func Attributes
+=func Attribute
+
+    Attribute('scalar', {
+        type => 'string',
+        example => 'foobar',
+        description => 'a text',
+    });
+    Attribute('list', {
+        enum => 'number',
+        example => 3,
+        description => 'a number from 1 to 5',
+        members => [1,2,3,4,5],
+    });
+    Attribute('hash' => [
+        foo => {
+            type => 'string',
+            ...
+        },
+        bar => {
+            ...
+        }
+    ]);
 
 =cut
 
@@ -437,6 +508,18 @@ sub Attribute : Exportable(singles) {
     return $str;
 }
 
+=func Attributes
+
+    Attributes('reference');
+    Attributes([
+        # Attribute
+        name => {
+            ...
+        }
+    ]);
+
+=cut
+
 # Attributes:
 sub Attributes : Exportable(singles) {
     my ($attrs, $indent) = @_;
@@ -452,35 +535,17 @@ sub Attributes : Exportable(singles) {
 
 =func Action
 
-B<Invokation>: Action(
-    Str C<:$method>,
-    Str C<:$uri>,
-    Str C<:$identifier>,
-    Str|CodeRef C<:$body>,
-    Int C<:$indent>,
-    Int C<:$level>,
-    Str C<:$relation>,
-    HashRef C<:$parameters>,
-    ArrayRef C<:$assets>,
-    ArrayRef C<:$request>,
-    ArrayRef C<:$requests>,
-    ArrayRef C<:$response>,
-    ArrayRef C<:$responses>
-)
+    Action({
+        ...
+    });
+
+B<Invokation>: Action(HashRef $args)
+
+Allowed keywords for C<$args>:
 
 =over 4
 
-=item * See L</Section> if C<$body> is a CodeRef
-
-=item * See L</Parameters> for C<$parameters>
-
-=item * See L</Asset> for C<$assets>
-
-=item * See L</Request> for C<$request> and C<$requests>
-
-=item * See L</Response> for C<$response> and C<$responses>
-
-=back
+=item * identifier, method, uri
 
 With C<$identifier> C<$method> and C<$uri>:
 
@@ -499,6 +564,42 @@ With C<$method>:
     ### $method
 
     $body
+
+Other combinations are invalid.
+
+=item * description
+
+=item * relation
+
+See L</Relation>.
+
+=item * parameters
+
+See L</Parameters>.
+
+=item * attributes
+
+See L</Attributes>.
+
+=item * assets
+
+Isa ArrayRef interpreted as a key/value paired associative list.
+
+The key is splited into two parts by the first whitespace, named I<keyword> and I<id>.
+
+If the value isa string, L</Reference> is called with C<<<(keyword, id, value)>>>
+
+If the value is anything else, L</Asset> is called with C<<<(keyword, id, value)>>>
+
+=item * requests
+
+See L</Request_Ref> if the value isa string. See L</Request> otherwise.
+
+=item * responses
+
+See L</Response_Ref> if the value isa string. See L</Response> otherwise.
+
+=back
 
 =cut
 
@@ -561,67 +662,49 @@ sub Action : Exportable() {
 
 =func Payload
 
-B<Invokation>: Payload(
-    Str C<:$description>,
-    HashRef C<:$headers>,
-    Str C<:$body>,
-    Str C<:$code>,
-    Str C<:$lang>,
-    AnyRef C<:$yaml>,
-    AnyRef C<:$json>,
-    Str C<:$schema>
-)
+    Payload({
+        ...
+    });
+
+B<Invokation>: Payload(HashRef $args)
+
+Allowed keywords for C<$args>:
 
 =over 4
 
-=item * See L</Body> for C<$body>
+=item * description
 
-=item * See L</Body_CODE> for C<$code> and C<$lang>
+A short introduction as a single string.
 
-=item * See L</Body_YAML> for C<$yaml>
+=item * headers
 
-=item * See L</Body_JSON> for C<$json>
+See L</Headers>.
+
+=item * attributes
+
+See L</Attributes>.
+
+=item * body
+
+See L</Body>.
+
+=item * code, lang
+
+See L</Bode_CODE>.
+
+=item * yaml
+
+See L</Body_YAML>.
+
+=item * json
+
+See L</Body_JSON>.
+
+=item * schema
+
+See L</Schema>.
 
 =back
-
-Complete output:
-
-    $description
-
-    + Headers
-            $key: $value
-
-    + Body
-
-    $body
-
-    + Schema
-
-    $schema
-
-With C<$code> and C<$lang>:
-
-    + Body
-
-        ```$lang
-        $code
-        ```
-
-With C<$yaml>:
-
-    + Body
-
-        ```yaml
-        $yaml
-        ```
-
-With C<$json>:
-
-    + Body
-
-        ```json
-        $json
-        ```
 
 =cut
 
@@ -651,12 +734,13 @@ sub Payload : Exportable() {
 
 =func Asset
 
-B<Invokation>: Asset(
-    Str C<$keyword>,
-    Str C<$identifier>,
-    Str C<:$type>,
-    C<%payload>
-)
+    Asset('Request', 'foo', {
+        type => 'mime/type',
+        # Payload
+        ...
+    });
+
+B<Invokation>: Asset( Str C<$keyword>, Str C<$identifier>, HashRef C<$payload> )
 
 See L</Payload> for C<%payload>
 
@@ -678,11 +762,10 @@ sub Asset : Exportable(singles) {
 
 =func Reference
 
-B<Invokation>: Reference(
-    Str C<$keyword>,
-    Str C<$identifier>,
-    Str C<$reference>
-)
+    Reference('Request', 'foo', 'bar');
+    Reference('Response', 'foo', 'bar');
+
+B<Invokation>: Reference(Str C<$keyword>, Str C<$identifier>, Str C<$reference>)
 
     # $keyword $identifier
 
@@ -698,9 +781,9 @@ sub Reference : Exportable(singles) {
 
 =func Request
 
-B<Invokation>: Request(
-    C<@args>
-)
+    Request('foo', { ... });
+
+B<Invokation>: Request(C<@args>)
 
 Calls L</Asset>( C<'Request'>, C<@args> )
 
@@ -714,9 +797,9 @@ sub Request : Exportable() {
 
 =func Request_Ref
 
-B<Invokation>: Request_Ref(
-    C<@args>
-)
+    Request_Ref('foo', 'bar');
+
+B<Invokation>: Request_Ref(C<@args>)
 
 Calls L</Reference>( C<'Request'>, C<@args> )
 
@@ -729,6 +812,8 @@ sub Request_Ref : Exportable() {
 }
 
 =func Response
+
+    Response('foo', { ... });
 
 B<Invokation>: Response(
     C<@args>
@@ -746,9 +831,9 @@ sub Response : Exportable() {
 
 =func Response_Ref
 
-B<Invokation>: Response_Ref(
-    C<@args>
-)
+    Response_Ref('foo', 'bar');
+
+B<Invokation>: Response_Ref(C<@args>)
 
 Calls L</Reference>( C<'Response'>, C<@args> )
 
@@ -762,15 +847,20 @@ sub Response_Ref : Exportable() {
 
 =func Parameters
 
-B<Invokation>: Parameters(
-    [
-        Str C<$name>
-        =>
-        HashRef C<$options>
-    ]*
-)
+    Parameters([
+        foo => {
+            # Parameter
+            ...
+        },
+        bar => {
+            # Parameter
+            ...
+        }
+    ]);
 
-For every keypair, L</Parameter>(C<$name>, C<%$options>) will be called
+B<Invokation>: Parameters(ArrayRef[Str|HashRef] $parameters)
+
+For every keypair in C<@$parameters> L</Parameter>(C<$key>, C<$value>) will be called
 
 =cut
 
@@ -786,17 +876,25 @@ sub Parameters : Exportable() {
 
 =func Parameter
 
-B<Invokation>: Parameter(
-    Str C<$name>,
-    Str C<:$example>,
-    Bool C<:$required>,
-    Str C<:$type>,
-    Str C<:$enum>,
-    Str C<:$shortdesc>,
-    Str|ArrayRef[Str] C<:$longdesc>,
-    Str C<:$default>,
-    HashRef C<:$members>
-)
+    Parameter('foo', {
+        example => 'foobar',
+        required => 1,
+        type => 'string',
+        shortdesc => 'a string',
+        longdesc => 'this is a string',
+        default => 'none',
+    });
+    Parameter('foo', {
+        example => '3',
+        required => 0,
+        enum => 'number',
+        shortdesc => 'an optional number',
+        longdesc => 'an integer between 1 and 5 (both inclusive)',
+        default => 1,
+        members => [1,2,3,4,5],
+    });
+
+B<Invokation>: Parameter( Str C<$name>, HashRef C<$args> )
 
     + $name: `$example` ($type, $required_or_optional) - $shortdesc
 
@@ -849,17 +947,14 @@ sub Parameter : Exportable(singles) {
 
 =func Headers
 
-B<Invokation>: Headers(
-    [
-        Str C<$key>
-        =>
-        Str C<$value>
-    ]*
-)
+    Headers([
+        FooBar => '...', # Foo-Bar
+        -foof  => '...', # X-Foof
+    ]);
 
-    + Headers
-        $key: $value
-        ...
+B<Invokation>: Headers(ArrayRef[Str] $headers)
+
+See also L<HTTP::Headers::Fancy>.
 
 =cut
 
@@ -881,9 +976,9 @@ sub Headers : Exportable(singles) {
 
 =func Body
 
-B<Invokation>: Body(
-    Str C<$body>
-)
+    Body('foobar');
+
+B<Invokation>: Body( Str C<$body> )
 
     + Body
 
@@ -899,10 +994,10 @@ sub Body : Exportable(singles) {
 
 =func Body_CODE
 
-B<Invokation>: Body_CODE(
-    Str C<$code>,
-    Str C<$lang>
-)
+    Body_CODE('foobar');
+    Body_CODE('foo', 'bar');
+
+B<Invokation>: Body_CODE( Str C<$code>, Str C<$lang> )
 
     + Body
 
@@ -919,9 +1014,10 @@ sub Body_CODE : Exportable() {
 
 =func Body_YAML
 
-B<Invokation>: Body_YAML(
-    AnyRef C<$struct>
-)
+    Body_YAML({ ... });
+    Body_YAML([ ... ]);
+
+B<Invokation>: Body_YAML( HashRef|ArrayRef C<$struct> )
 
     + Body
 
@@ -945,9 +1041,10 @@ sub Body_YAML : Exportable() {
 
 =func Body_JSON
 
-B<Invokation>: Body_JSON(
-    AnyRef C<$struct>
-)
+    Body_JSON({ ... });
+    Body_JSON([ ... ]);
+
+B<Invokation>: Body_JSON( HashRef|ArrayRef C<$struct> )
 
     + Body
 
@@ -972,9 +1069,9 @@ sub Body_JSON : Exportable() {
 
 =func Relation
 
-B<Invokation>: Relation(
-    Str C<$link>
-)
+    Relation('foo');
+
+B<Invokation>: Relation( Str C<$link> )
 
     + Relation: $link
 
