@@ -8,6 +8,7 @@ use Class::Load qw(load_class);
 use Exception::Delayed;
 use Carp qw(croak confess);
 use Exporter::Attributes qw(import);
+use HTTP::Headers::Fancy 1.001 ();
 
 # VERSION
 
@@ -954,20 +955,17 @@ sub Parameter : Exportable(singles) {
 
 B<Invokation>: Headers(ArrayRef[Str] $headers)
 
-See also L<HTTP::Headers::Fancy>.
+The headers are encoded and prettified in a fancy way. See L<HTTP::Headers::Fancy> for more information.
 
 =cut
 
 # Headers:
 sub Headers : Exportable(singles) {
     my $body = '';
+    my $fancy = HTTP::Headers::Fancy->new;
     _arrayhashloop(shift, sub {
         my ($name, $value) = @_;
-        $name =~ s{^-(.)}{'x'.uc($1)}e;
-        $name = lc($name =~ s{([a-z])([A-Z])}{$1-$2}gr);
-        $name =~ s{_}{-}g;
-        $name =~ s{-+([^-]+)}{'-'.ucfirst($1)}eg;
-        $name = ucfirst($name);
+        $name = $fancy->prettify_key($fancy->encode_key($name));
         $body .= "\n    $name: $value";
     });
     $body =~ s{^\n+}{}s;
