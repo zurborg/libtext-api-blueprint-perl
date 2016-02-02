@@ -3,20 +3,22 @@ use strictures 2;
 package t::tests;
 
 use Import::Into ();
-use Exporter::Attributes ();
+use Exporter ();
 
 use Test::More ();
 use Text::Diff ();
+
+our @EXPORT = qw(tdt);
 
 sub import {
     my $caller = scalar caller;
     for my $module (qw(strictures Test::More)) {
         $module->import::into($caller);
     }
-    goto &Exporter::Attributes::import;
+    goto &Exporter::import;
 }
 
-sub tdt : Exported { # test with diff text
+sub tdt { # test with diff text
     my ($is, $should) = (shift, shift);
     if ($is eq $should) {
         goto &Test::More::pass;
