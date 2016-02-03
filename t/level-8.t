@@ -3,9 +3,43 @@
 use t::tests;
 use Text::API::Blueprint qw(Compile);
 
-use constant EOL => "\n";
+plan tests => 6;
 
-plan tests => 1;
+################################################################################
+
+tdt(Compile(), <<'EOT', 'Compile()');
+FORMAT: 1A8
+EOT
+
+################################################################################
+
+tdt(Compile({}), <<'EOT', 'Compile({})');
+FORMAT: 1A8
+EOT
+
+################################################################################
+
+tdt(Compile({host=>'host'}), <<'EOT', 'Compile({host})');
+FORMAT: 1A8
+HOST: host
+EOT
+
+################################################################################
+
+tdt(Compile({name=>'name'}), <<'EOT', 'Compile({name})');
+FORMAT: 1A8
+
+# name
+EOT
+
+################################################################################
+
+tdt(Compile({host=>'host',name=>'name'}), <<'EOT', 'Compile({host,name})');
+FORMAT: 1A8
+HOST: host
+
+# name
+EOT
 
 ################################################################################
 
@@ -20,7 +54,7 @@ tdt(Compile({
     groups => [
         foo => 'bar'
     ]
-}).EOL, <<'EOT', 'Compile');
+}), <<'EOT', 'Compile({host,name,description,resources,groups})');
 FORMAT: 1A8
 HOST: host
 

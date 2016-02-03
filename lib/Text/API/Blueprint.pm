@@ -141,8 +141,12 @@ BEGIN { push @EXPORT_OK => qw(Compile) }
 sub Compile {
     my $struct = shift;
     my @Body;
-    push @Body => Meta(delete $struct->{host});
-    push @Body => Intro(delete $struct->{name}, delete $struct->{description});
+
+    my ($host, $name, $description) = map { delete $struct->{$_} } qw(host name description);
+
+    push @Body => Meta($host);
+    push @Body => Intro($name, $description) if $name;
+
     if (my $resources = delete $struct->{resources}) {
         foreach my $resource (@$resources) {
             push @Body => Resource($resource);
@@ -155,7 +159,7 @@ sub Compile {
         });
     }
     _complain(Compile => $struct);
-    return _autoprint(wantarray, Concat(@Body));
+    return _autoprint(wantarray, Concat(@Body)."\n");
 }
 
 =func Section
