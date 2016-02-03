@@ -3,7 +3,7 @@
 use t::tests;
 use Text::API::Blueprint qw(Meta Intro Concat Code Schema Attributes Reference Headers Body Relation);
 
-plan tests => 12;
+plan tests => 13;
 
 ################################################################################
 
@@ -19,6 +19,17 @@ tdt(Intro('foo', 'bar') => <<EOT, 'Intro');
 # foo
 
 bar
+
+EOT
+
+################################################################################
+
+tdt(Intro('foo', ['bar', 'baz']) => <<EOT, 'Intro');
+# foo
+
+bar
+
+baz
 
 EOT
 

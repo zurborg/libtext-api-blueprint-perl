@@ -70,7 +70,11 @@ sub _header {
     my $str = '#' x ($level + $Offset);
     $str .= " $title\n\n";
     $body = _indent($body, $indent) if $indent;
-    $str .= "$body\n\n" if $body;
+    if (ref $body eq 'ARRAY') {
+        $str .= Concat(@$body)."\n\n";
+    } elsif ($body) {
+        $str .= "$body\n\n";
+    }
     return $str;
 }
 
