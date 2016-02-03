@@ -5,7 +5,7 @@ use Text::API::Blueprint qw(Action);
 
 use constant EOL => "\n";
 
-plan tests => 13;
+plan tests => 14;
 
 ################################################################################
 
@@ -24,6 +24,22 @@ tdt(Action({
 ### method
 
 description
+
+EOT
+
+################################################################################
+
+tdt(Action({
+    (map {$_=>$_} qw(method)),
+    description => [qw[foo bar baz]],
+}), <<'EOT', 'Action');
+### method
+
+foo
+
+bar
+
+baz
 
 EOT
 

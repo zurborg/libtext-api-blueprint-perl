@@ -651,7 +651,11 @@ sub Action {
         $body = Section($body);
     } else {
         my @body;
-        push @body => $description if defined $description;
+        if (ref $description eq 'ARRAY') {
+            push @body => @$description;
+        } elsif (defined $description) {
+            push @body => $description;
+        }
         push @body => Relation($relation) if defined $relation;
         push @body => Parameters($parameters) if defined $parameters;
         push @body => Attributes($attributes) if defined $attributes;
