@@ -136,7 +136,7 @@ our @EXPORT_OK;
 
 =cut
 
-# Compile: Meta Intro Resource Group Concat
+# Compile (8) Meta Intro Resource Group Concat
 BEGIN { push @EXPORT_OK => qw(Compile) }
 sub Compile {
     my $struct = shift;
@@ -174,7 +174,7 @@ Increments header offset by C<$offset> for everything executed in C<$coderef>.
 
 =cut
 
-# Section:
+# Section (-)
 BEGIN { push @EXPORT_OK => qw(Section) }
 sub Section {
     my ($coderef, $offset) = @_;
@@ -202,7 +202,7 @@ B<Invokation>: Meta([ Str C<$host> ])
 
 =cut
 
-# Meta:
+# Meta (0)
 BEGIN { push @EXPORT_OK => qw(Meta) }
 sub Meta {
     my $str = "FORMAT: 1A8\n";
@@ -224,6 +224,7 @@ B<Invokation>: Intro(Str C<$name>, [ Str C<$description> ])
 
 =cut
 
+# Intro (0)
 BEGIN { push @EXPORT_OK => qw(Intro) }
 sub Intro {
     my ($name, $description) = @_;
@@ -246,7 +247,7 @@ B<Invokation>: Concat( Str C<@blocks> )
 
 =cut
 
-# Concat:
+# Concat (0)
 BEGIN { push @EXPORT_OK => qw(Concat) }
 sub Concat {
     return _autoprint(wantarray, join "\n\n", map { _trim($_) } grep defined, @_);
@@ -265,7 +266,7 @@ B<Invokation>: Text( Str C<@strings> )
 
 =cut
 
-# Text: Concat
+# Text (1) Concat
 BEGIN { push @EXPORT_OK => qw(Text) }
 sub Text {
     return _autoprint(wantarray, Concat(map { _flatten($_) } map { s{[\r\n]+}{\n}gr } @_));
@@ -284,7 +285,7 @@ B<Invokation>: Code(Str C<$code>, [ Str C<$lang> = C<''> ])
 
 =cut
 
-# Code:
+# Code (0)
 BEGIN { push @EXPORT_OK => qw(Code) }
 sub Code {
     my ($code, $lang) = @_;
@@ -319,7 +320,7 @@ If C<$body> is an ArrayRef, every item which is a HashRef will be passed to L</R
 
 =cut
 
-# Group: Concat Resource
+# Group (2) Concat Resource
 BEGIN { push @EXPORT_OK => qw(Group) }
 sub Group {
     my ($identifier, $body, $indent) = @_;
@@ -393,7 +394,7 @@ See L</Action>.
 
 =cut
 
-# Resource: Sesction Parameters Model Attributes Action
+# Resource (7) Sesction Parameters Model Attributes Action
 BEGIN { push @EXPORT_OK => qw(Resource) }
 sub Resource {
     my $args = shift;
@@ -442,7 +443,7 @@ See L</Payload> if the first and only argument is a HashRef.
 
 =cut
 
-# Model: Payload
+# Model (4) Payload
 BEGIN { push @EXPORT_OK => qw(Model) }
 sub Model {
     if (@_ == 1 and ref $_[0] eq 'HASH') {
@@ -468,7 +469,7 @@ B<Invokation>: Schema(Str C<$body>, [ Int C<$indent> ])
 
 =cut
 
-# Schema:
+# Schema (0)
 BEGIN { push @EXPORT_OK => qw(Schema) }
 sub Schema {
     my ($body, $indent) = @_;
@@ -500,6 +501,7 @@ sub Schema {
 
 =cut
 
+# Attribute (-)
 sub Attribute ;
 BEGIN { push @EXPORT_OK => qw(Attribute) }
 sub Attribute {
@@ -545,7 +547,7 @@ sub Attribute {
 
 =cut
 
-# Attributes:
+# Attributes (0) Attribute
 BEGIN { push @EXPORT_OK => qw(Attributes) }
 sub Attributes {
     my ($attrs, $indent) = @_;
@@ -629,7 +631,7 @@ See L</Response_Ref> if the value isa string. See L</Response> otherwise.
 
 =cut
 
-# Action: Section Relation Parameters Attributes Asset Reference Request_Ref Request Response_Ref Response Concat
+# Action (6) Section Relation Parameters Attributes Asset Reference Request_Ref Request Response_Ref Response Concat
 BEGIN { push @EXPORT_OK => qw(Action) }
 sub Action {
     my $args = shift;
@@ -735,7 +737,7 @@ See L</Schema>.
 
 =cut
 
-# Payload: Headers Attributes Body Body_CODE Body_YAML Body_JSON Schema Concat
+# Payload (3) Headers Attributes Body Body_CODE Body_YAML Body_JSON Schema Concat
 BEGIN { push @EXPORT_OK => qw(Payload) }
 sub Payload {
     my $args = shift;
@@ -778,7 +780,7 @@ See L</Payload> for C<%payload>
 
 =cut
 
-# Asset: Payload
+# Asset (4) Payload
 BEGIN { push @EXPORT_OK => qw(Asset) }
 sub Asset {
     my ($keyword, $identifier, $payload) = @_;
@@ -802,7 +804,7 @@ B<Invokation>: Reference(Str C<$keyword>, Str C<$identifier>, Str C<$reference>)
 
 =cut
 
-# Reference:
+# Reference (0)
 BEGIN { push @EXPORT_OK => qw(Reference) }
 sub Reference {
     my ($keyword, $identifier, $reference) = @_;
@@ -819,7 +821,7 @@ Calls L</Asset>( C<'Request'>, C<@args> )
 
 =cut
 
-# Request: Asset
+# Request (5) Asset
 BEGIN { push @EXPORT_OK => qw(Request) }
 sub Request {
     unshift @_ => 'Request';
@@ -836,7 +838,7 @@ Calls L</Reference>( C<'Request'>, C<@args> )
 
 =cut
 
-# Request_Ref: Reference
+# Request_Ref (1) Reference
 BEGIN { push @EXPORT_OK => qw(Request_Ref) }
 sub Request_Ref {
     unshift @_ => 'Request';
@@ -855,7 +857,7 @@ Calls L</Asset>( C<'Response'>, C<@args> )
 
 =cut
 
-# Response: Asset
+# Response (5) Asset
 BEGIN { push @EXPORT_OK => qw(Response) }
 sub Response {
     unshift @_ => 'Response';
@@ -872,7 +874,7 @@ Calls L</Reference>( C<'Response'>, C<@args> )
 
 =cut
 
-# Response_Ref: Reference
+# Response_Ref (1) Reference
 BEGIN { push @EXPORT_OK => qw(Response_Ref) }
 sub Response_Ref {
     unshift @_ => 'Response';
@@ -898,7 +900,7 @@ For every keypair in C<@$parameters> L</Parameter>(C<$key>, C<$value>) will be c
 
 =cut
 
-# Parameters: Parameter
+# Parameters (2) Parameter
 BEGIN { push @EXPORT_OK => qw(Parameters) }
 sub Parameters {
     my $body = '';
@@ -943,7 +945,7 @@ B<Invokation>: Parameter( Str C<$name>, HashRef C<$args> )
 
 =cut
 
-# Parameter: Concat
+# Parameter (1) Concat
 BEGIN { push @EXPORT_OK => qw(Parameter) }
 sub Parameter {
     my ($name, $opts) = @_;
@@ -994,7 +996,7 @@ The headers are encoded and prettified in a fancy way. See L<HTTP::Headers::Fanc
 
 =cut
 
-# Headers:
+# Headers (0)
 BEGIN { push @EXPORT_OK => qw(Headers) }
 sub Headers {
     my $body = '';
@@ -1020,7 +1022,7 @@ B<Invokation>: Body( Str C<$body> )
 
 =cut
 
-# Body:
+# Body (0)
 BEGIN { push @EXPORT_OK => qw(Body) }
 sub Body {
     my $body = _flatten(shift);
@@ -1042,7 +1044,7 @@ B<Invokation>: Body_CODE( Str C<$code>, Str C<$lang> )
 
 =cut
 
-# Body_CODE: Code
+# Body_CODE (1) Code
 BEGIN { push @EXPORT_OK => qw(Body_CODE) }
 sub Body_CODE {
     return _autoprint(wantarray, _listitem('Body', Code(@_)));
@@ -1069,7 +1071,7 @@ sub _yaml {
     YAML::Any::Dump($struct);
 }
 
-# Body_YAML: Body_CODE
+# Body_YAML (2) Body_CODE
 BEGIN { push @EXPORT_OK => qw(Body_YAML) }
 sub Body_YAML {
     my ($struct) = @_;
@@ -1098,7 +1100,7 @@ sub _json {
     $JSON->encode($struct);
 }
 
-# Body_JSON: Body_CODE
+# Body_JSON (2) Body_CODE
 BEGIN { push @EXPORT_OK => qw(Body_JSON) }
 sub Body_JSON {
     my ($struct) = @_;
@@ -1115,7 +1117,7 @@ B<Invokation>: Relation( Str C<$link> )
 
 =cut
 
-# Relation:
+# Relation (0)
 BEGIN { push @EXPORT_OK => qw(Relation) }
 sub Relation {
     my $link = shift;
