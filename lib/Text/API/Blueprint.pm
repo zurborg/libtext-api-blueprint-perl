@@ -754,7 +754,13 @@ BEGIN { push @EXPORT_OK => qw(Payload) }
 sub Payload {
     my $args = shift;
     my @body;
-    push @body => delete $args->{description} if exists $args->{description};
+    if (exists $args->{description}) {
+        if (ref $args->{description} eq 'ARRAY') {
+            push @body => @{ delete $args->{description} };
+        } else {
+            push @body => delete $args->{description};
+        }
+    }
     push @body => Headers(delete $args->{headers}) if exists $args->{headers};
     push @body => Attributes(delete $args->{attributes}) if exists $args->{attributes};
 
