@@ -1,8 +1,11 @@
 Revision history for Text-API-Blueprint
 
 {{$NEXT}}
+
+0.002 2016-02-03
  - make host and name for Compile() optional
- - allow paragraphs via ArrayRef in Intro, Resource, Action and Payload description
+ - allow paragraphs via ArrayRef in Intro, Resource, Action and Payload
+   description
 
 0.001 2016-02-02
  - Initial release
