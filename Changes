@@ -1,6 +1,7 @@
 Revision history for Text-API-Blueprint
 
 {{$NEXT}}
+ - fix problem with Dist::Zilla of last release
 
 0.002 2016-02-03
  - make host and name for Compile() optional
